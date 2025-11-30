@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node scripts/restructureQuestions.js:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

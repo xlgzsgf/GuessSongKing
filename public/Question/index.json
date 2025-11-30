@@ -1,0 +1,24 @@
+{
+  "version": "2.0",
+  "lastUpdate": "2025-11-30T12:17:41.868Z",
+  "artists": [
+    {
+      "id": "001",
+      "name": "薛之谦",
+      "avatar": "https://ss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=1593598121,2602566230&fm=58&bpow=1000&bpoh=1777",
+      "songCount": 123
+    },
+    {
+      "id": "002",
+      "name": "陈奕迅",
+      "avatar": "https://p7.itc.cn/images01/20231019/1809a79e92f5494dad493c6538fb6ace.jpeg",
+      "songCount": 211
+    },
+    {
+      "id": "003",
+      "name": "周杰伦",
+      "avatar": "https://q1.itc.cn/images01/20250922/110a9f6b433d4177ab23db9f7ef62c9f.jpeg",
+      "songCount": 138
+    }
+  ]
+}
