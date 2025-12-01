@@ -52,8 +52,8 @@ jobs:
         with:
           accessKeyId: ${{ secrets.OSS_ACCESS_KEY_ID }}
           accessKeySecret: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
-          bucket: ${{ env.OSS_BUCKET }}
-          endpoint: ${{ env.OSS_REGION }}
+          bucket: ${{ vars.OSS_BUCKET }}
+          endpoint: ${{ vars.OSS_REGION }}
           folder: dist
           incremental: true
           skipSetting: true
