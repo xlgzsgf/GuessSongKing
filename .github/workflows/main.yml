@@ -62,10 +62,6 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
     environment: edgeone
-    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.skip_purge != 'true' }}
-    env:
-      EDGEONE_TARGETS_INPUT: ${{ github.event.inputs.edgeone_targets || '' }}
-      EDGEONE_PURGE_TYPE_INPUT: ${{ github.event.inputs.edgeone_purge_type || '' }}
     steps:
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -81,10 +77,9 @@ jobs:
           TENCENT_CLOUD_SECRET_KEY: ${{ secrets.TENCENT_CLOUD_SECRET_KEY }}
           EDGEONE_ZONE_ID: ${{ secrets.EDGEONE_ZONE_ID }}
           EDGEONE_TARGETS: ${{ secrets.EDGEONE_TARGETS }}
-          EDGEONE_PURGE_TYPE: ${{ secrets.EDGEONE_PURGE_TYPE }}
+          EDGEONE_PURGE_TYPE: ${{ env.EDGEONE_PURGE_TYPE }}
           EDGEONE_REGION: ${{ secrets.EDGEONE_REGION }}
           EDGEONE_TARGETS_INPUT: ${{ env.EDGEONE_TARGETS_INPUT }}
-          EDGEONE_PURGE_TYPE_INPUT: ${{ env.EDGEONE_PURGE_TYPE_INPUT }}
         run: |
           cat <<'EOF' > clearCache.js
           const tencentcloud = require('tencentcloud-sdk-nodejs');
@@ -96,7 +91,7 @@ jobs:
             .split(/[\n,]/)
             .map(item => item.trim())
             .filter(Boolean);
-          const type = process.env.EDGEONE_PURGE_TYPE_INPUT || process.env.EDGEONE_PURGE_TYPE || 'purge_host';
+          const type = process.env.EDGEONE_PURGE_TYPE || 'purge_host';
 
           if (!zoneId) {
             throw new Error('EDGEONE_ZONE_ID is required.');
