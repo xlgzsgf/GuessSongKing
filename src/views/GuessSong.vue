@@ -21,8 +21,7 @@
             <div class="wrap">
                 <div class="avatar-pic" :class="{ avatar: isPlaying, pause: !isPlaying }">
                     <img :src="currentArtistAvatar || 'https://ss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=1593598121,2602566230&fm=58&bpow=1000&bpoh=1777'"
-                        :alt="currentArtistName || 'album cover'"
-                        @error="handleImageError">
+                        :alt="currentArtistName || 'album cover'" @error="handleImageError">
                 </div>
                 <div class="play-control" @click="togglePlay" v-if="gameStarted">
                     <span class="play-icon" v-if="!isPlaying"></span>
@@ -30,79 +29,44 @@
                 </div>
             </div>
             <p class="player-hint" v-if="!gameStarted">点击"开始"按钮开始游戏</p>
-            <p class="player-hint" v-else>{{ currentArtistName ? `正在播放 ${currentArtistName} 曲库的歌曲...` : '正在播放中...' }}</p>
+            <p class="player-hint" v-else>{{ currentArtistName ? `正在播放 ${currentArtistName} 曲库的歌曲...` : '正在播放中...' }}
+            </p>
         </div>
 
         <div class="game-content">
             <van-form @submit="checkData">
-                <van-field
-                    v-model="songName"
-                    name="songName"
-                    placeholder="请输入歌名"
-                    :disabled="!gameStarted"
-                    class="song-input"
-                    clearable
-                />
-                <van-button
-                    :type="gameStarted ? 'danger' : 'success'"
-                    block
-                    size="large"
-                    native-type="submit"
-                    class="check-btn"
-                    round
-                >
+                <van-field v-model="songName" name="songName" placeholder="请输入歌名" :disabled="!gameStarted"
+                    class="song-input" clearable />
+                <van-button :type="gameStarted ? 'danger' : 'success'" block size="large" native-type="submit"
+                    class="check-btn" round>
                     {{ gameStarted ? '确认答案' : '开始游戏' }}
                 </van-button>
             </van-form>
 
             <div class="action-buttons">
                 <div class="button-row">
-                    <van-button
-                        type="warning"
-                        size="large"
-                        @click="replayMusic"
-                        :disabled="!gameStarted"
-                        class="action-btn replay-btn"
-                        round
-                    >
+                    <van-button type="warning" size="large" @click="replayMusic" :disabled="!gameStarted"
+                        class="action-btn replay-btn" round>
                         <span class="btn-icon icon-replay"></span>
                         重播
                     </van-button>
 
-                    <van-button
-                        type="default"
-                        size="large"
-                        @click="pauseGame"
-                        :disabled="!gameStarted"
-                        class="action-btn pause-btn"
-                        round
-                    >
+                    <van-button type="default" size="large" @click="pauseGame" :disabled="!gameStarted"
+                        class="action-btn pause-btn" round>
                         <span class="btn-icon icon-pause"></span>
                         暂停
                     </van-button>
                 </div>
 
                 <div class="button-row">
-                    <van-button
-                        type="default"
-                        size="large"
-                        @click="jumpNext"
-                        :disabled="!gameStarted"
-                        class="action-btn skip-btn"
-                        round
-                    >
+                    <van-button type="default" size="large" @click="jumpNext" :disabled="!gameStarted"
+                        class="action-btn skip-btn" round>
                         <span class="btn-icon icon-skip"></span>
                         跳过
                     </van-button>
 
-                    <van-button
-                        type="primary"
-                        size="large"
-                        @click="showScore"
-                        :disabled="gameStarted && !gamePaused"
-                        class="action-btn score-btn"
-                        round
-                    >
+                    <van-button type="primary" size="large" @click="showScore" :disabled="gameStarted && !gamePaused"
+                        class="action-btn score-btn" round>
                         <span class="btn-icon icon-score"></span>
                         成绩
                     </van-button>
@@ -112,12 +76,46 @@
 
         <audio ref="audioRef" :src="currentMusic" autoplay hidden></audio>
 
+        <!-- 跳过确认弹窗 -->
+        <van-popup v-model:show="showSkipPopup"
+            :style="{ padding: '32px 28px', borderRadius: '24px', background: 'linear-gradient(180deg, #0f0f0f 0%, #1a1a1a 100%)', maxWidth: '90%', width: '360px', border: '1px solid rgba(255, 255, 255, 0.1)' }"
+            :close-on-click-overlay="false">
+            <div class="skip-popup">
+                <div class="skip-icon icon-skip-large"></div>
+                <h3 class="skip-title">确定要跳过这首歌吗？</h3>
+                <p class="skip-hint">跳过的题目不计入得分，下一题会随机换歌</p>
+                <div class="skip-buttons">
+                    <van-button type="primary" block size="large" class="skip-popup-btn confirm" round
+                        @click="confirmSkip">
+                        确认跳过
+                    </van-button>
+                    <van-button type="default" block size="large" class="skip-popup-btn cancel" round
+                        @click="cancelSkip">
+                        再听听
+                    </van-button>
+                </div>
+            </div>
+        </van-popup>
+
+        <!-- 跳过结果弹窗 -->
+        <van-popup v-model:show="showSkipResultPopup"
+            :style="{ padding: '32px 28px', borderRadius: '24px', background: 'linear-gradient(180deg, #0f0f0f 0%, #1a1a1a 100%)', maxWidth: '90%', width: '360px', border: '1px solid rgba(255, 255, 255, 0.1)' }"
+            :close-on-click-overlay="false">
+            <div class="skip-result">
+                <div class="skip-result-label">答案揭晓</div>
+                <div class="skip-result-artist">{{ skippedArtistName || '未知歌手' }}</div>
+                <div class="skip-result-song">《{{ skippedSongName || '未知歌曲' }}》</div>
+                <van-button type="primary" block size="large" round class="skip-popup-btn confirm"
+                    @click="handleSkipResultConfirm">
+                    下一题
+                </van-button>
+            </div>
+        </van-popup>
+
         <!-- 暂停弹窗 -->
-        <van-popup
-            v-model:show="showPausePopup"
-            :style="{ padding: '40px 30px', borderRadius: '24px', background: 'linear-gradient(180deg, #0f0f0f 0%, #1a1a1a 100%)', maxWidth: '90%', width: '360px' }"
-            :close-on-click-overlay="false"
-        >
+        <van-popup v-model:show="showPausePopup"
+            :style="{ padding: '40px 30px', borderRadius: '24px', background: 'linear-gradient(180deg, #0f0f0f 0%, #1a1a1a 100%)', maxWidth: '90%', width: '360px', border: '1px solid rgba(255, 255, 255, 0.1)' }"
+            :close-on-click-overlay="false">
             <div class="pause-content">
                 <div class="pause-icon icon-pause-large"></div>
                 <h3 class="pause-title">游戏已暂停</h3>
@@ -135,35 +133,16 @@
                 </div>
 
                 <div class="pause-buttons">
-                    <van-button
-                        type="primary"
-                        block
-                        size="large"
-                        @click="resumeGame"
-                        class="pause-btn resume-btn"
-                        round
-                    >
+                    <van-button type="primary" block size="large" @click="resumeGame" class="pause-btn resume-btn"
+                        round>
                         继续游戏
                     </van-button>
-                    <van-button
-                        type="default"
-                        block
-                        size="large"
-                        @click="showScoreFromPause"
-                        class="pause-btn view-score-btn"
-                        round
-                    >
+                    <van-button type="default" block size="large" @click="showScoreFromPause"
+                        class="pause-btn view-score-btn" round>
                         <span class="btn-icon icon-score-white"></span>
                         查看成绩
                     </van-button>
-                    <van-button
-                        type="default"
-                        block
-                        size="large"
-                        @click="endGame"
-                        class="pause-btn end-btn"
-                        round
-                    >
+                    <van-button type="default" block size="large" @click="endGame" class="pause-btn end-btn" round>
                         结束游戏
                     </van-button>
                 </div>
@@ -171,14 +150,9 @@
         </van-popup>
 
         <!-- 成绩弹窗 -->
-        <van-popup
-            v-model:show="showScorePopup"
-            position="bottom"
-            :style="{ padding: '30px 20px 40px', borderRadius: '20px 20px 0 0', background: 'linear-gradient(180deg, #0f0f0f 0%, #1a1a1a 100%)' }"
-            closeable
-            close-icon-position="top-right"
-            @close="onScorePopupClose"
-        >
+        <van-popup v-model:show="showScorePopup" position="bottom"
+            :style="{ padding: '30px 20px 40px', borderRadius: '20px 20px 0 0', background: 'linear-gradient(180deg, #0f0f0f 0%, #1a1a1a 100%)', border: '1px solid rgba(255, 255, 255, 0.1)' }"
+            closeable close-icon-position="top-right" @close="onScorePopupClose">
             <div class="score-content">
                 <div class="score-header">
                     <h3 class="score-title">{{ gameStarted ? '本局成绩' : '历史统计' }}</h3>
@@ -211,7 +185,8 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">正确率</div>
-                        <div class="stat-value">{{ totalQuestions > 0 ? Math.round((successNumber / totalQuestions) * 100) : 0 }}%</div>
+                        <div class="stat-value">{{ totalQuestions > 0 ? Math.round((successNumber / totalQuestions) *
+                            100) : 0 }}%</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">总用时</div>
@@ -219,7 +194,8 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">平均用时</div>
-                        <div class="stat-value">{{ totalQuestions > 0 ? Math.round(useTime / totalQuestions) : 0 }}秒</div>
+                        <div class="stat-value">{{ totalQuestions > 0 ? Math.round(useTime / totalQuestions) : 0 }}秒
+                        </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">重播次数</div>
@@ -297,7 +273,6 @@ import {
     Field as VanField,
     Popup as VanPopup,
     showToast,
-    showDialog,
     showConfirmDialog
 } from 'vant'
 import { saveGameRecord, getGameStats, getRecentRecords, saveCurrentGame, getCurrentGame, clearCurrentGame } from '../utils/gameStorage'
@@ -326,9 +301,13 @@ const currentQuestionAttempts = ref(0) // 当前题目尝试次数
 const timer = ref(null)
 const showScorePopup = ref(false)
 const showPausePopup = ref(false)
+const showSkipPopup = ref(false)
+const showSkipResultPopup = ref(false)
 const questionData = ref([]) // 改为数组存储所有歌曲
 const answeredSongs = ref(new Set()) // 存储已回答的歌曲ID
 const historyStats = ref(null)
+const skippedSongName = ref('')
+const skippedArtistName = ref('')
 
 // 曲库相关状态
 const currentArtistId = ref(null)
@@ -425,7 +404,7 @@ function checkData() {
 
     // 宽松匹配函数：转小写并清除特殊字符
     const normalizeString = (str) => {
-      return str.toLowerCase().replace(/[\s\u3000\u00A0\u2000-\u200F\u2028-\u202F\u205F-\u206F\uFEFF\p{P}\p{S}]/gu, '')
+        return str.toLowerCase().replace(/[\s\u3000\u00A0\u2000-\u200F\u2028-\u202F\u205F-\u206F\uFEFF\p{P}\p{S}]/gu, '')
     }
 
     if (normalizeString(songName.value) === normalizeString(currentSong.value)) {
@@ -783,24 +762,27 @@ function jumpNext() {
         return
     }
 
-    showConfirmDialog({
-        title: '确定要跳过吗？',
-        message: '跳过的题目不算做分数哦~',
-        confirmButtonText: '确认',
-        cancelButtonText: '取消'
-    }).then(() => {
-        skipNumber.value++
-        totalQuestions.value++
-        showDialog({
-            title: `答案：${currentSong.value}`,
-            message: '',
-            confirmButtonText: '好吧'
-        }).then(() => {
-            nextSong()
-        })
-    }).catch(() => {
-        // 取消
-    })
+    showSkipPopup.value = true
+}
+
+function cancelSkip() {
+    showSkipPopup.value = false
+}
+
+function confirmSkip() {
+    showSkipPopup.value = false
+    skipNumber.value++
+    totalQuestions.value++
+    skippedSongName.value = currentSong.value || '未知歌曲'
+    skippedArtistName.value = (currentSongData.value && currentSongData.value.artistName)
+        || currentArtistName.value
+        || '未知歌手'
+    showSkipResultPopup.value = true
+}
+
+function handleSkipResultConfirm() {
+    showSkipResultPopup.value = false
+    nextSong()
 }
 
 onMounted(async () => {
@@ -830,8 +812,8 @@ onUnmounted(() => {
 .guess-song {
     min-height: 100vh;
     background: linear-gradient(180deg, #0f0f0f 0%, #1a1a1a 100%);
-  padding: 0px 20px 40px;
-  display: flex;
+    padding: 0px 20px 40px;
+    display: flex;
     flex-direction: column;
 }
 
@@ -949,8 +931,8 @@ onUnmounted(() => {
     display: block;
     cursor: default;
     box-shadow: 0 0 0 12px rgba(0, 245, 255, 0.08),
-                0 0 0 24px rgba(0, 245, 255, 0.04),
-                0 16px 48px rgba(0, 0, 0, 0.6);
+        0 0 0 24px rgba(0, 245, 255, 0.04),
+        0 16px 48px rgba(0, 0, 0, 0.6);
     border: 4px solid rgba(0, 245, 255, 0.25);
     position: relative;
 }
@@ -962,6 +944,7 @@ onUnmounted(() => {
     border-radius: 50%;
     padding: 4px;
     background: linear-gradient(135deg, #00f5ff, #00d4ff, #0099ff);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -1039,7 +1022,7 @@ onUnmounted(() => {
 }
 
 .avatar {
-    animation: rotator 6s linear infinite;
+    animation: rotator 6s cubic-bezier(0.4, 0.1, 0.6, 0.9) paused;
     animation-play-state: running;
 }
 
@@ -1048,10 +1031,12 @@ onUnmounted(() => {
 }
 
 @keyframes rotator {
-    from {
+    0% {
         transform: rotate(0deg);
+        animation-timing-function: cubic-bezier(0.4, 0.1, 0.6, 0.9);
     }
-    to {
+
+    100% {
         transform: rotate(360deg);
     }
 }
@@ -1145,7 +1130,7 @@ onUnmounted(() => {
 }
 
 .btn-icon.icon-score-white {
-  background-image: url(/static/icon/Star.svg);
+    background-image: url(/static/icon/Star.svg);
 }
 
 .pause-icon.icon-pause-large {
@@ -1204,6 +1189,174 @@ onUnmounted(() => {
 .skip-btn,
 .score-btn {
     flex: 1;
+}
+
+.skip-popup,
+.skip-result {
+    text-align: center;
+}
+
+.skip-icon.icon-skip-large {
+    display: inline-block;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    background-image: url(/static/icon/Right_Arrow.svg);
+    background-repeat: no-repeat;
+    background-size: contain;
+    filter: drop-shadow(0 0 20px rgba(0, 245, 255, 0.45));
+}
+
+.skip-title {
+    font-size: 24px;
+    margin: 0 0 12px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.8px;
+}
+
+.skip-hint {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 28px;
+    line-height: 1.5;
+}
+
+.skip-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.skip-popup-btn {
+    height: 50px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border: none;
+}
+
+.skip-popup-btn.confirm {
+    background: linear-gradient(135deg, #00f5ff 0%, #00d4ff 100%);
+    color: #000;
+    box-shadow: 0 8px 24px rgba(0, 245, 255, 0.4);
+}
+
+.skip-popup-btn.cancel {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.skip-result-label {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.65);
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+.skip-result-song {
+    font-size: 26px;
+    font-weight: 700;
+    color: #00f5ff;
+    margin-bottom: 24px;
+}
+
+/* 跳过弹窗样式 */
+.skip-popup {
+    text-align: center;
+}
+
+.skip-icon {
+    font-size: 48px;
+    color: #00f5ff;
+    margin-bottom: 20px;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.skip-icon.icon-skip-large {
+    background-image: url(/static/icon/Right_Arrow.svg);
+    filter: drop-shadow(0 0 20px rgba(0, 245, 255, 0.5));
+}
+
+.skip-title {
+    font-size: 22px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #00f5ff 0%, #00d4ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 12px 0;
+    letter-spacing: 1px;
+}
+
+.skip-hint {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0 0 28px 0;
+    letter-spacing: 0.5px;
+    line-height: 1.5;
+}
+
+.skip-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.skip-popup-btn {
+    height: 54px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.skip-popup-btn.confirm {
+    background: linear-gradient(135deg, #00f5ff 0%, #00d4ff 100%);
+    border: none;
+    color: #000;
+    box-shadow: 0 8px 24px rgba(0, 245, 255, 0.4);
+}
+
+.skip-popup-btn.cancel {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* 跳过结果显示弹窗 */
+.skip-result {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.skip-result-label {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+
+.skip-result-artist {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+
+.skip-result-song {
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #00f5ff 0%, #00d4ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 32px;
+    padding: 0 20px;
 }
 
 /* 暂停弹窗样式 */
