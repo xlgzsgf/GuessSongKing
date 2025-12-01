@@ -36,7 +36,7 @@
         <div class="game-content">
             <van-form @submit="checkData">
                 <van-field v-model="songName" name="songName" placeholder="请输入歌名" :disabled="!gameStarted"
-                    class="song-input" clearable />
+                    :class="['song-input', { 'input-shake': isInputShaking }]" clearable />
                 <van-button :type="gameStarted ? 'danger' : 'success'" block size="large" native-type="submit"
                     class="check-btn" round>
                     {{ gameStarted ? '确认答案' : '开始游戏' }}
@@ -45,8 +45,8 @@
 
             <div class="action-buttons">
                 <div class="button-row">
-                    <van-button type="warning" size="large" @click="replayMusic" :disabled="!gameStarted"
-                        class="action-btn replay-btn" round>
+                    <van-button type="warning" size="large" @click="replayMusic"
+                        :disabled="!gameStarted || isCorrectEffectPlaying" class="action-btn replay-btn" round>
                         <span class="btn-icon icon-replay"></span>
                         重播
                     </van-button>
@@ -109,6 +109,29 @@
                     @click="handleSkipResultConfirm">
                     下一题
                 </van-button>
+            </div>
+        </van-popup>
+
+        <!-- 退出游戏弹窗 -->
+        <van-popup v-model:show="showExitPopup"
+            :style="{ padding: '32px 28px', borderRadius: '24px', background: 'linear-gradient(180deg, #0f0f0f 0%, #1a1a1a 100%)', maxWidth: '90%', width: '360px', border: '1px solid rgba(255, 255, 255, 0.1)' }"
+            :close-on-click-overlay="false">
+            <div class="exit-popup">
+                <div class="exit-icon"></div>
+                <h3 class="exit-title">要退出游戏吗？</h3>
+                <p class="exit-hint">你可以结束本局，或暂停后稍后继续</p>
+                <div class="exit-buttons">
+                    <van-button type="primary" block size="large" class="exit-btn end" round @click="confirmExitGame">
+                        结束本局并退出
+                    </van-button>
+                    <van-button type="default" block size="large" class="exit-btn pause" round @click="pauseAndExit">
+                        暂停并退出
+                    </van-button>
+                    <van-button type="default" block size="large" class="exit-btn cancel" round
+                        @click="showExitPopup = false">
+                        继续游戏
+                    </van-button>
+                </div>
             </div>
         </van-popup>
 
@@ -265,15 +288,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
     Button as VanButton,
     Form as VanForm,
     Field as VanField,
     Popup as VanPopup,
-    showToast,
-    showConfirmDialog
+    showToast
 } from 'vant'
 import { saveGameRecord, getGameStats, getRecentRecords, saveCurrentGame, getCurrentGame, clearCurrentGame } from '../utils/gameStorage'
 import { loadAllSongs, loadArtistSongs, loadArtistInfo, getRandomSong, getArtistAvatarUrl } from '../utils/questionLoader'
@@ -303,16 +325,122 @@ const showScorePopup = ref(false)
 const showPausePopup = ref(false)
 const showSkipPopup = ref(false)
 const showSkipResultPopup = ref(false)
+const showExitPopup = ref(false)
 const questionData = ref([]) // 改为数组存储所有歌曲
 const answeredSongs = ref(new Set()) // 存储已回答的歌曲ID
 const historyStats = ref(null)
 const skippedSongName = ref('')
 const skippedArtistName = ref('')
+const isInputShaking = ref(false)
+const isCorrectEffectPlaying = ref(false)
+
+let correctEffectAudio = null
+let wrongEffectAudio = null
+let skipEffectAudio = null
+let correctEffectEndedHandler = null
+
+function initEffectAudios() {
+    if (typeof Audio === 'undefined') {
+        return
+    }
+
+    correctEffectAudio = new Audio('/static/effect/correct-answer.mp3')
+    correctEffectAudio.preload = 'auto'
+    correctEffectEndedHandler = () => {
+        isCorrectEffectPlaying.value = false
+    }
+    correctEffectAudio.addEventListener('ended', correctEffectEndedHandler)
+
+    wrongEffectAudio = new Audio('/static/effect/wrong-answer.mp3')
+    wrongEffectAudio.preload = 'auto'
+
+    skipEffectAudio = new Audio('/static/effect/skip-question.mp3')
+    skipEffectAudio.preload = 'auto'
+}
+
+function cleanupEffectAudios() {
+    stopCorrectEffect()
+    stopAudioInstance(wrongEffectAudio)
+    stopSkipEffect()
+
+    if (correctEffectAudio && correctEffectEndedHandler) {
+        correctEffectAudio.removeEventListener('ended', correctEffectEndedHandler)
+    }
+
+    correctEffectAudio = null
+    wrongEffectAudio = null
+    skipEffectAudio = null
+    correctEffectEndedHandler = null
+}
+
+function stopAudioInstance(audio) {
+    if (audio) {
+        audio.pause()
+        audio.currentTime = 0
+    }
+}
+
+function playCorrectEffect() {
+    if (!correctEffectAudio) return
+    stopAudioInstance(correctEffectAudio)
+    isCorrectEffectPlaying.value = true
+    correctEffectAudio.play().catch(() => {
+        isCorrectEffectPlaying.value = false
+    })
+}
+
+function stopCorrectEffect() {
+    stopAudioInstance(correctEffectAudio)
+    isCorrectEffectPlaying.value = false
+}
+
+function playWrongEffect() {
+    triggerInputShake()
+    if (!wrongEffectAudio) return
+    stopAudioInstance(wrongEffectAudio)
+    wrongEffectAudio.play().catch(() => {
+        // ignore
+    })
+}
+
+function playSkipEffect() {
+    if (!skipEffectAudio) return
+    stopAudioInstance(skipEffectAudio)
+    skipEffectAudio.play().catch(() => {
+        // ignore
+    })
+}
+
+function stopSkipEffect() {
+    stopAudioInstance(skipEffectAudio)
+}
+
+function triggerInputShake() {
+    isInputShaking.value = false
+    const activate = () => {
+        isInputShaking.value = true
+        setTimeout(() => {
+            isInputShaking.value = false
+        }, 500)
+    }
+
+    if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(activate)
+    } else {
+        activate()
+    }
+}
 
 // 曲库相关状态
 const currentArtistId = ref(null)
 const currentArtistName = ref(null)
 const currentArtistAvatar = ref('')
+
+watch(showSkipResultPopup, (visible) => {
+    if (!visible) {
+        stopSkipEffect()
+    }
+})
 
 // 加载题目数据
 async function loadQuestionData() {
@@ -409,6 +537,7 @@ function checkData() {
 
     if (normalizeString(songName.value) === normalizeString(currentSong.value)) {
         // 答对了
+        playCorrectEffect()
         showToast({
             type: 'success',
             message: currentQuestionAttempts.value === 1 ? '一次过！' : '答对啦'
@@ -422,6 +551,7 @@ function checkData() {
 
         nextSong()
     } else {
+        playWrongEffect()
         showToast({
             type: 'fail',
             message: '不对哦'
@@ -441,6 +571,11 @@ function nextSong() {
 }
 
 function replayMusic() {
+    if (isCorrectEffectPlaying.value) {
+        showToast('音效播放完才能重播哦')
+        return
+    }
+
     if (audioRef.value && currentMusic.value) {
         audioRef.value.currentTime = 0
         audioRef.value.play().catch(error => {
@@ -629,23 +764,20 @@ function handleBackClick() {
         return
     }
 
-    // 如果游戏已开始，显示确认对话框
-    showConfirmDialog({
-        title: '退出游戏',
-        message: '请选择退出方式',
-        confirmButtonText: '结束游戏',
-        cancelButtonText: '暂停退出',
-        confirmButtonColor: '#ee0a24',
-        cancelButtonColor: '#00f5ff'
-    }).then(() => {
-        // 点击"结束游戏"
-        endGame()
-        router.push('/library-select')
-    }).catch(() => {
-        // 点击"暂停退出"
-        pauseGame()
-        router.push('/library-select')
-    })
+    // 游戏进行中，展示自定义退出弹窗
+    showExitPopup.value = true
+}
+
+function confirmExitGame() {
+    showExitPopup.value = false
+    endGame()
+    router.push('/library-select')
+}
+
+function pauseAndExit() {
+    showExitPopup.value = false
+    pauseGame()
+    router.push('/library-select')
 }
 
 function endGame() {
@@ -778,14 +910,18 @@ function confirmSkip() {
         || currentArtistName.value
         || '未知歌手'
     showSkipResultPopup.value = true
+    playSkipEffect()
 }
 
 function handleSkipResultConfirm() {
+    stopSkipEffect()
     showSkipResultPopup.value = false
     nextSong()
 }
 
 onMounted(async () => {
+    initEffectAudios()
+
     // 先加载题目数据
     await loadQuestionData()
 
@@ -805,6 +941,7 @@ onUnmounted(() => {
         audioRef.value.pause()
         audioRef.value = null
     }
+    cleanupEffectAudios()
 })
 </script>
 
@@ -1056,6 +1193,36 @@ onUnmounted(() => {
     border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
     transition: all 0.3s ease;
+}
+
+.song-input.input-shake {
+    animation: input-shake 0.45s ease;
+}
+
+@keyframes input-shake {
+    0% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-6px);
+    }
+
+    40% {
+        transform: translateX(6px);
+    }
+
+    60% {
+        transform: translateX(-4px);
+    }
+
+    80% {
+        transform: translateX(4px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
 }
 
 .song-input:focus-within {
@@ -1357,6 +1524,83 @@ onUnmounted(() => {
     background-clip: text;
     margin-bottom: 32px;
     padding: 0 20px;
+}
+
+.exit-popup {
+    text-align: center;
+}
+
+.exit-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 95, 109, 0.6);
+    position: relative;
+    box-shadow: 0 0 20px rgba(255, 95, 109, 0.3);
+}
+
+.exit-icon::before,
+.exit-icon::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 3px;
+    height: 28px;
+    background: linear-gradient(180deg, #ff5f6d 0%, #ffc371 100%);
+    transform-origin: center;
+    border-radius: 999px;
+}
+
+.exit-icon::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.exit-icon::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.exit-title {
+    font-size: 24px;
+    margin: 0 0 12px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.8px;
+}
+
+.exit-hint {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 28px;
+    line-height: 1.5;
+}
+
+.exit-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.exit-btn {
+    height: 52px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.exit-btn.end {
+    background: linear-gradient(135deg, #ff5f6d 0%, #ffc371 100%);
+    border: none;
+    color: #000;
+    box-shadow: 0 8px 24px rgba(255, 95, 109, 0.4);
+}
+
+.exit-btn.pause,
+.exit-btn.cancel {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.85);
 }
 
 /* 暂停弹窗样式 */

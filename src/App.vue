@@ -12,7 +12,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
   overflow-x: hidden;
@@ -48,4 +49,3 @@ body {
   background: rgba(255, 255, 255, 0.3);
 }
 </style>
-
