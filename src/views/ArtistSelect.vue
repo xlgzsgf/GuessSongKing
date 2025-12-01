@@ -6,7 +6,7 @@
         <span class="back-text">返回</span>
       </div>
       <div style="width: 30%;text-align: center;margin: 10px auto">
-        <img style="width: 100%" src="/static/logo.png" alt="猜歌王" class="logo">
+        <img style="width: 100%;max-width:200px" src="/static/logo.png" alt="猜歌王" class="logo">
       </div>
       <h1 class="page-title">选择你的歌手</h1>
       <p class="page-subtitle">开启专属音乐挑战</p>

@@ -7,7 +7,7 @@
 		"dev": "vite",
 		"build": "vite build",
 		"preview": "vite preview",
-		"add-songs": "node scripts/addSongs.js"
+		"add-songs": "node scripts/songManager.js"
 	},
 	"dependencies": {
 		"fs-extra": "^11.3.2",
