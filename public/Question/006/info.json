@@ -1,0 +1,289 @@
+{
+  "artistId": "006",
+  "artistName": "TFBOYS",
+  "songCount": 40,
+  "songs": [
+    {
+      "id": "001",
+      "name": "Heart",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "002",
+      "name": "Love With You",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "003",
+      "name": "不完美小孩",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "004",
+      "name": "不息之河",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "005",
+      "name": "为梦想,时刻准备着",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "006",
+      "name": "信仰之名",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "007",
+      "name": "加油！AMIGO",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "008",
+      "name": "同一秒快乐",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "009",
+      "name": "和你在一起",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "010",
+      "name": "喜欢你",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "011",
+      "name": "大梦想家",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "012",
+      "name": "宠爱",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "013",
+      "name": "小精灵",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "014",
+      "name": "幸运符号",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "015",
+      "name": "开学第一课",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "016",
+      "name": "快乐环岛",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "017",
+      "name": "恋西游",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "018",
+      "name": "想唱就唱",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "019",
+      "name": "我们的时光",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "020",
+      "name": "我的朋友",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "021",
+      "name": "明天见",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "022",
+      "name": "是你",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "023",
+      "name": "最好的那年",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "024",
+      "name": "未来的进击",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "025",
+      "name": "样",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "026",
+      "name": "梦想起航",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "027",
+      "name": "灯火",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "028",
+      "name": "爱出发",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "029",
+      "name": "真心话太冒险",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "030",
+      "name": "第一次告白",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "031",
+      "name": "萤火",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "032",
+      "name": "记.念",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "033",
+      "name": "躲猫猫",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "034",
+      "name": "青春修炼手册",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "035",
+      "name": "魔法城堡",
+      "artists": [
+        "TFBOYS"
+      ]
+    },
+    {
+      "id": "036",
+      "name": "剩下的盛夏",
+      "artists": [
+        "TFBOYS",
+        "嘻游记"
+      ]
+    },
+    {
+      "id": "037",
+      "name": "一首简单的歌",
+      "artists": [
+        "易烊千玺"
+      ]
+    },
+    {
+      "id": "038",
+      "name": "不要说话",
+      "artists": [
+        "王俊凯"
+      ]
+    },
+    {
+      "id": "039",
+      "name": "阳光宅男",
+      "artists": [
+        "王俊凯"
+      ]
+    },
+    {
+      "id": "040",
+      "name": "倔强",
+      "artists": [
+        "王源"
+      ]
+    }
+  ],
+  "defaultArtist": "TFBOYS"
+}
