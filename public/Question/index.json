@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdate": "2025-11-30T12:17:41.868Z",
+  "lastUpdate": "2025-12-01T06:57:20.933Z",
   "artists": [
     {
       "id": "001",
@@ -19,6 +19,12 @@
       "name": "周杰伦",
       "avatar": "https://q1.itc.cn/images01/20250922/110a9f6b433d4177ab23db9f7ef62c9f.jpeg",
       "songCount": 138
+    },
+    {
+      "id": "004",
+      "name": "华语金曲",
+      "avatar": "https://img1.kuwo.cn/star/starheads/500/64/18/4137672274.jpg",
+      "songCount": 207
     }
   ]
 }

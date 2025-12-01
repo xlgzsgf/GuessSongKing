@@ -1,5 +1,5 @@
 <template>
-  <div class="artist-select">
+  <div class="library-select">
     <div class="header-section">
       <div class="back-button" @click="goBack">
         <span class="back-icon">←</span>
@@ -8,47 +8,47 @@
       <div style="width: 30%;text-align: center;margin: 10px auto">
         <img style="width: 100%;max-width:200px" src="/static/logo.png" alt="猜歌王" class="logo">
       </div>
-      <h1 class="page-title">选择你的歌手</h1>
+      <h1 class="page-title">选择曲库</h1>
       <p class="page-subtitle">开启专属音乐挑战</p>
     </div>
 
     <div class="content-section">
-      <div class="artist-grid" v-if="!loading && artists.length > 0">
+      <div class="library-grid" v-if="!loading && libraries.length > 0">
         <div
-          v-for="artist in artists"
-          :key="artist.id"
-          class="artist-card"
-          @click="selectArtist(artist)"
+          v-for="library in libraries"
+          :key="library.id"
+          class="library-card"
+          @click="selectLibrary(library)"
         >
-          <div class="artist-avatar-wrapper">
+          <div class="library-avatar-wrapper">
             <img
-              :src="getArtistAvatar(artist)"
-              :alt="artist.name"
+              :src="getLibraryAvatar(library)"
+              :alt="library.name"
               @error="handleImageError"
-              class="artist-avatar"
+              class="library-avatar"
             />
             <div class="avatar-overlay"></div>
           </div>
-          <div class="artist-details">
-            <div class="artist-name-row">
-              <h2 class="artist-name">{{ artist.name }}</h2>
-              <span class="playing-badge" v-if="hasActiveGame(artist.id)">游戏中</span>
+          <div class="library-details">
+            <div class="library-name-row">
+              <h2 class="library-name">{{ library.name }}</h2>
+              <span class="playing-badge" v-if="hasActiveGame(library.id)">游戏中</span>
             </div>
-            <p class="song-count">{{ artist.songCount }} 首歌曲</p>
+            <p class="song-count">{{ library.songCount }} 首歌曲</p>
 
             <!-- 统计信息 -->
-            <div class="artist-stats" v-if="getArtistStats(artist.id)">
+            <div class="library-stats" v-if="getLibraryStats(library.id)">
               <div class="stat-item">
                 <span class="stat-label">挑战</span>
-                <span class="stat-value">{{ getArtistStats(artist.id).totalGames }}局</span>
+                <span class="stat-value">{{ getLibraryStats(library.id).totalGames }}局</span>
               </div>
               <div class="stat-item">
                 <span class="stat-label">答对</span>
-                <span class="stat-value">{{ getArtistStats(artist.id).totalCorrect }}题</span>
+                <span class="stat-value">{{ getLibraryStats(library.id).totalCorrect }}题</span>
               </div>
               <div class="stat-item">
                 <span class="stat-label">最佳</span>
-                <span class="stat-value">{{ getArtistStats(artist.id).bestAccuracy }}%</span>
+                <span class="stat-value">{{ getLibraryStats(library.id).bestAccuracy }}%</span>
               </div>
             </div>
             <div class="no-stats" v-else>
@@ -63,8 +63,8 @@
         <p class="loading-text">加载中...</p>
       </div>
 
-      <div class="empty-state" v-if="!loading && artists.length === 0">
-        <p class="empty-text">暂无歌手数据</p>
+      <div class="empty-state" v-if="!loading && libraries.length === 0">
+        <p class="empty-text">暂无曲库数据</p>
       </div>
     </div>
 
@@ -81,9 +81,9 @@ import { showToast } from 'vant'
 import { getGameRecords, getCurrentGame } from '../utils/gameStorage'
 
 const router = useRouter()
-const artists = ref([])
+const libraries = ref([])
 const loading = ref(true)
-const artistStats = ref({})
+const libraryStats = ref({})
 
 // 加载题库索引
 const loadQuestionIndex = async () => {
@@ -94,27 +94,27 @@ const loadQuestionIndex = async () => {
       throw new Error('加载题库索引失败')
     }
     const data = await response.json()
-    artists.value = data.artists || []
+    libraries.value = data.artists || []
   } catch (error) {
     console.error('加载题库索引失败:', error)
-    artists.value = []
+    libraries.value = []
   } finally {
     loading.value = false
   }
 }
 
-// 加载歌手统计数据
-const loadArtistStats = () => {
+// 加载曲库统计数据
+const loadLibraryStats = () => {
   const records = getGameRecords()
   const stats = {}
 
-  // 统计每个歌手的游戏数据
+  // 统计每个曲库的游戏数据
   records.forEach(record => {
-    const artistId = record.artistId
-    if (!artistId) return
+    const libraryId = record.artistId
+    if (!libraryId) return
 
-    if (!stats[artistId]) {
-      stats[artistId] = {
+    if (!stats[libraryId]) {
+      stats[libraryId] = {
         totalGames: 0,
         totalCorrect: 0,
         totalQuestions: 0,
@@ -122,40 +122,40 @@ const loadArtistStats = () => {
       }
     }
 
-    stats[artistId].totalGames++
-    stats[artistId].totalCorrect += record.correct || 0
-    stats[artistId].totalQuestions += record.total || 0
+    stats[libraryId].totalGames++
+    stats[libraryId].totalCorrect += record.correct || 0
+    stats[libraryId].totalQuestions += record.total || 0
 
     // 更新最佳正确率
     const accuracy = record.accuracy || 0
-    if (accuracy > stats[artistId].bestAccuracy) {
-      stats[artistId].bestAccuracy = accuracy
+    if (accuracy > stats[libraryId].bestAccuracy) {
+      stats[libraryId].bestAccuracy = accuracy
     }
   })
 
-  artistStats.value = stats
+  libraryStats.value = stats
 }
 
-// 检查歌手是否有活跃的游戏
-const hasActiveGame = (artistId) => {
-  const savedGame = getCurrentGame(artistId)
+// 检查曲库是否有活跃的游戏
+const hasActiveGame = (libraryId) => {
+  const savedGame = getCurrentGame(libraryId)
   return savedGame && savedGame.gameStarted
 }
 
-// 获取歌手统计信息
-const getArtistStats = (artistId) => {
-  return artistStats.value[artistId] || null
+// 获取曲库统计信息
+const getLibraryStats = (libraryId) => {
+  return libraryStats.value[libraryId] || null
 }
 
-// 获取歌手头像
-const getArtistAvatar = (artist) => {
-  if (artist.avatar) {
+// 获取曲库头像
+const getLibraryAvatar = (library) => {
+  if (library.avatar) {
     // 如果是完整URL，直接返回
-    if (artist.avatar.startsWith('http://') || artist.avatar.startsWith('https://')) {
-      return artist.avatar
+    if (library.avatar.startsWith('http://') || library.avatar.startsWith('https://')) {
+      return library.avatar
     }
     // 否则当作相对路径处理
-    return artist.avatar
+    return library.avatar
   }
   // 默认头像
   return '/static/logo.png'
@@ -166,13 +166,13 @@ const handleImageError = (e) => {
   e.target.src = '/static/logo.png'
 }
 
-// 选择歌手
-const selectArtist = (artist) => {
+// 选择曲库
+const selectLibrary = (library) => {
   router.push({
     name: 'GuessSong',
     query: {
-      artistId: artist.id,
-      artistName: artist.name
+      artistId: library.id,
+      artistName: library.name
     }
   })
 }
@@ -184,17 +184,17 @@ const goBack = () => {
 
 onMounted(() => {
   loadQuestionIndex()
-  loadArtistStats()
+  loadLibraryStats()
 })
 
-// 监听艺术家列表变化，当艺术家数据加载完成后检查游戏状态
-watch(artists, () => {
+// 监听曲库列表变化，当曲库数据加载完成后检查游戏状态
+watch(libraries, () => {
   // 不需要额外的操作，因为 hasActiveGame 函数会在渲染时调用
 })
 </script>
 
 <style scoped>
-.artist-select {
+.library-select {
   min-height: 100vh;
   background: linear-gradient(180deg, #0f0f0f 0%, #1a1a1a 100%);
   display: flex;
@@ -270,14 +270,14 @@ watch(artists, () => {
   flex-direction: column;
 }
 
-.artist-grid {
+.library-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
   margin-bottom: 40px;
 }
 
-.artist-card {
+.library-card {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
@@ -288,7 +288,7 @@ watch(artists, () => {
   overflow: hidden;
 }
 
-.artist-card::before {
+.library-card::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -297,28 +297,28 @@ watch(artists, () => {
   transition: opacity 0.3s ease;
 }
 
-.artist-card:hover {
+.library-card:hover {
   transform: translateY(-4px);
   border-color: rgba(0, 245, 255, 0.3);
   box-shadow: 0 8px 32px rgba(0, 245, 255, 0.2);
 }
 
-.artist-card:hover::before {
+.library-card:hover::before {
   opacity: 1;
 }
 
-.artist-card:active {
+.library-card:active {
   transform: translateY(-2px) scale(0.98);
 }
 
-.artist-avatar-wrapper {
+.library-avatar-wrapper {
   position: relative;
   width: 120px;
   height: 120px;
   margin: 0 auto 20px;
 }
 
-.artist-avatar {
+.library-avatar {
   width: 100%;
   height: 100%;
   border-radius: 50%;
@@ -327,7 +327,7 @@ watch(artists, () => {
   transition: all 0.3s ease;
 }
 
-.artist-card:hover .artist-avatar {
+.library-card:hover .library-avatar {
   border-color: #00f5ff;
   box-shadow: 0 0 20px rgba(0, 245, 255, 0.4);
 }
@@ -341,17 +341,17 @@ watch(artists, () => {
   transition: opacity 0.3s ease;
 }
 
-.artist-card:hover .avatar-overlay {
+.library-card:hover .avatar-overlay {
   opacity: 1;
 }
 
-.artist-details {
+.library-details {
   text-align: center;
   position: relative;
   z-index: 1;
 }
 
-.artist-name-row {
+.library-name-row {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -359,7 +359,7 @@ watch(artists, () => {
   margin-bottom: 8px;
 }
 
-.artist-name {
+.library-name {
   font-size: 20px;
   font-weight: bold;
   color: white;
@@ -398,7 +398,7 @@ watch(artists, () => {
 }
 
 /* 统计信息 */
-.artist-stats {
+.library-stats {
   display: flex;
   gap: 12px;
   justify-content: center;
@@ -497,7 +497,7 @@ watch(artists, () => {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .artist-select {
+  .library-select {
     padding: 20px 15px;
   }
 
@@ -509,21 +509,21 @@ watch(artists, () => {
     font-size: 14px;
   }
 
-  .artist-grid {
+  .library-grid {
     grid-template-columns: 1fr;
     gap: 16px;
   }
 
-  .artist-card {
+  .library-card {
     padding: 20px;
   }
 
-  .artist-avatar-wrapper {
+  .library-avatar-wrapper {
     width: 100px;
     height: 100px;
   }
 
-  .artist-name {
+  .library-name {
     font-size: 18px;
   }
 
@@ -545,13 +545,13 @@ watch(artists, () => {
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
-  .artist-grid {
+  .library-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (min-width: 1025px) {
-  .artist-grid {
+  .library-grid {
     grid-template-columns: repeat(3, 1fr);
     max-width: 1200px;
     margin-left: auto;

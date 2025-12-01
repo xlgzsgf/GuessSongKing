@@ -45,7 +45,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 function startGame() {
-    router.push('/artist-select')
+    router.push('/library-select')
 }
 </script>
 

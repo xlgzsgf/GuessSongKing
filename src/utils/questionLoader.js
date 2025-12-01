@@ -119,16 +119,18 @@ export async function loadArtistSongs(artistId) {
     try {
         const artistInfo = await loadArtistInfo(artistId)
 
-        return artistInfo.songs.map(song => ({
+        return artistInfo.songs.map(song => {
             // 使用歌曲中定义的歌手信息，如果没有则使用默认歌手
             const songArtists = song.artists || [artistInfo.defaultArtist || artistInfo.artistName]
             
-            artistId: artistInfo.artistId,
-            artistName: songArtists.join('、'),
-            songId: song.id,
-            songName: song.name,
-            url: getSongUrl(artistInfo.artistId, song.id)
-        }))
+            return {
+                artistId: artistInfo.artistId,
+                artistName: songArtists.join('、'),
+                songId: song.id,
+                songName: song.name,
+                url: getSongUrl(artistInfo.artistId, song.id)
+            }
+        })
     } catch (error) {
         console.error(`加载歌手 ${artistId} 的歌曲失败:`, error)
         throw error

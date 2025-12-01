@@ -30,7 +30,7 @@
                 </div>
             </div>
             <p class="player-hint" v-if="!gameStarted">点击"开始"按钮开始游戏</p>
-            <p class="player-hint" v-else>{{ currentArtistName ? `正在播放 ${currentArtistName} 的歌曲...` : '正在播放中...' }}</p>
+            <p class="player-hint" v-else>{{ currentArtistName ? `正在播放 ${currentArtistName} 曲库的歌曲...` : '正在播放中...' }}</p>
         </div>
 
         <div class="game-content">
@@ -330,7 +330,7 @@ const questionData = ref([]) // 改为数组存储所有歌曲
 const answeredSongs = ref(new Set()) // 存储已回答的歌曲ID
 const historyStats = ref(null)
 
-// 歌手相关状态
+// 曲库相关状态
 const currentArtistId = ref(null)
 const currentArtistName = ref(null)
 const currentArtistAvatar = ref('')
@@ -338,25 +338,25 @@ const currentArtistAvatar = ref('')
 // 加载题目数据
 async function loadQuestionData() {
     try {
-        // 从路由参数获取歌手信息
+        // 从路由参数获取曲库信息
         const artistId = route.query.artistId
         const artistName = route.query.artistName
 
         if (artistId) {
-            // 加载指定歌手的歌曲
+            // 加载指定曲库的歌曲
             currentArtistId.value = artistId
             currentArtistName.value = artistName
 
-            // 加载歌手信息以获取头像
+            // 加载曲库信息以获取头像
             const artistInfo = await loadArtistInfo(artistId)
             currentArtistAvatar.value = getArtistAvatarUrl(artistInfo.avatar)
 
-            // 加载歌手的歌曲
+            // 加载曲库的歌曲
             const songs = await loadArtistSongs(artistId)
             questionData.value = songs
-            console.log(`成功加载歌手 ${artistName} 的 ${songs.length} 首歌曲`)
+            console.log(`成功加载曲库 ${artistName} 的 ${songs.length} 首歌曲`)
         } else {
-            // 没有指定歌手，加载所有歌曲
+            // 没有指定曲库，加载所有歌曲
             const songs = await loadAllSongs()
             questionData.value = songs
             console.log(`成功加载 ${songs.length} 首歌曲`)
@@ -374,7 +374,7 @@ function loadRandomSong() {
     }
 
     // 过滤掉已经回答过的歌曲
-    const availableSongs = questionData.value.filter(song => 
+    const availableSongs = questionData.value.filter(song =>
         !answeredSongs.value.has(song.songId)
     )
 
@@ -423,7 +423,12 @@ function checkData() {
     currentQuestionAttempts.value++ // 增加尝试次数
     totalQuestions.value++
 
-    if (songName.value === currentSong.value) {
+    // 宽松匹配函数：转小写并清除特殊字符
+    const normalizeString = (str) => {
+      return str.toLowerCase().replace(/[\s\u3000\u00A0\u2000-\u200F\u2028-\u202F\u205F-\u206F\uFEFF\p{P}\p{S}]/gu, '')
+    }
+
+    if (normalizeString(songName.value) === normalizeString(currentSong.value)) {
         // 答对了
         showToast({
             type: 'success',
@@ -545,7 +550,7 @@ function restoreGameState() {
     firstTrySuccess.value = savedState.firstTrySuccess || 0
     totalQuestions.value = savedState.totalQuestions || 0
     useTime.value = savedState.useTime || 0
-    
+
     // 恢复已回答的歌曲列表
     if (savedState.answeredSongs) {
         answeredSongs.value = new Set(savedState.answeredSongs)
@@ -641,7 +646,7 @@ function resumeGame() {
 function handleBackClick() {
     if (!gameStarted.value) {
         // 如果游戏未开始，直接返回
-        router.push('/artist-select')
+        router.push('/library-select')
         return
     }
 
@@ -656,11 +661,11 @@ function handleBackClick() {
     }).then(() => {
         // 点击"结束游戏"
         endGame()
-        router.push('/artist-select')
+        router.push('/library-select')
     }).catch(() => {
         // 点击"暂停退出"
         pauseGame()
-        router.push('/artist-select')
+        router.push('/library-select')
     })
 }
 

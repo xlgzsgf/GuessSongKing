@@ -12,7 +12,7 @@ import ffmpeg from 'fluent-ffmpeg'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const QUESTION_DIR = path.join(__dirname, '../Question')
+const QUESTION_DIR = path.join(__dirname, '../public/Question')
 const INDEX_FILE = path.join(QUESTION_DIR, 'index.json')
 const AUDIO_DURATION = 6 // 截取音频时长（秒）
 
@@ -35,24 +35,6 @@ function trimAudio(inputPath, outputPath, duration = AUDIO_DURATION) {
     })
 }
 
-// 从文件名中提取歌手信息
-function extractArtistsFromFile(filename) {
-    // 匹配格式如 "薛之谦 - 演员" 或 "薛之谦、韩红 - 小尖尖"
-    const match = filename.match(/^([^-]+)\s*-/) 
-    if (match) {
-        // 提取歌手部分并去除多余空格
-        const artistsStr = match[1].trim()
-        // 如果包含顿号或者中文逗号，分割成多个歌手
-        if (artistsStr.includes('、') || artistsStr.includes('，') || artistsStr.includes(',')) {
-            return artistsStr.split(/[、，,]/).map(artist => artist.trim())
-        }
-        // 单一歌手
-        return [artistsStr]
-    }
-    // 无法提取歌手信息
-    return null
-}
-
 // 从文件名中提取歌曲名（删除括号及其内容）
 function extractSongName(filename) {
     // 删除括号及其内容，支持各种括号类型: (), [], {}, （）, 【】
@@ -68,7 +50,7 @@ function extractPureSongName(filename) {
     // 先删除括号内容
     const cleanFilename = extractSongName(filename);
     // 匹配格式如 "薛之谦 - 演员" 或 "薛之谦、韩红 - 小尖尖"
-    const match = cleanFilename.match(/^[^-]+\s*-\s*(.+)$/) 
+    const match = cleanFilename.match(/^[^-]+\s*-\s*(.+)$/)
     if (match) {
         // 提取歌曲名部分并去除多余空格
         return match[1].trim();
@@ -82,7 +64,7 @@ function extractArtistsFromFile(filename) {
     // 先删除括号内容
     const cleanFilename = extractSongName(filename)
     // 匹配格式如 "薛之谦 - 演员" 或 "薛之谦、韩红 - 小尖尖"
-    const match = cleanFilename.match(/^([^-]+)\s*-/) 
+    const match = cleanFilename.match(/^([^-]+)\s*-/)
     if (match) {
         // 提取歌手部分并去除多余空格
         const artistsStr = match[1].trim()
@@ -264,14 +246,14 @@ async function batchImportSongs(index, artistId) {
         // 检查是否与本次导入的其他歌曲重复
         if (newSongMap.has(cleanSongNameLower)) {
             const existingFile = newSongMap.get(cleanSongNameLower)
-            
+
             // 优先选择无括号的版本
-            const hasBrackets = (file.includes('(') || file.includes('[') || file.includes('{') || 
+            const hasBrackets = (file.includes('(') || file.includes('[') || file.includes('{') ||
                                file.includes('（') || file.includes('【'))
-            const existingHasBrackets = (existingFile.file.includes('(') || existingFile.file.includes('[') || 
-                                        existingFile.file.includes('{') || existingFile.file.includes('（') || 
+            const existingHasBrackets = (existingFile.file.includes('(') || existingFile.file.includes('[') ||
+                                        existingFile.file.includes('{') || existingFile.file.includes('（') ||
                                         existingFile.file.includes('【'))
-            
+
             if (hasBrackets && !existingHasBrackets) {
                 // 新文件有括号，已有文件无括号，保留已有文件，标记新文件为重复
                 duplicateFiles.push({ file, songName: cleanSongName, reason: '与本次导入的其他歌曲重复' })
@@ -363,22 +345,22 @@ async function batchImportSongs(index, artistId) {
 
             // 从文件名中提取歌手信息
             const artistFromFilename = extractArtistsFromFile(songName)
-            
+
             // 清理歌曲名（删除括号内容并提取纯净歌曲名）
             const cleanSongName = extractSongName(songName)
             const pureSongName = extractPureSongName(songName)
-            
+
             // 添加到歌曲列表
             const songObj = {
                 id: newId,
                 name: pureSongName
             }
-            
+
             // 如果能从文件名提取到歌手信息，则添加歌手字段
             if (artistFromFilename) {
                 songObj.artists = artistFromFilename
             }
-            
+
             artistInfo.songs.push(songObj)
 
             console.log(`  ✅ ${file} → ${newFileName} (${songName})`)
@@ -506,21 +488,21 @@ async function addSongsToArtist(index, artistId) {
         // 清理歌曲名（删除括号内容并提取纯净歌曲名）
         const cleanSongName = extractSongName(songName.trim())
         const pureSongName = extractPureSongName(songName.trim())
-        
+
         // 从文件名中提取歌手信息
         const artistFromFilename = extractArtistsFromFile(songName.trim())
-        
+
         // 添加歌曲
         const songObj = {
             id: fileId,
             name: pureSongName
         }
-        
+
         // 如果能从文件名提取到歌手信息，则添加歌手字段
         if (artistFromFilename) {
             songObj.artists = artistFromFilename
         }
-        
+
         artistInfo.songs.push(songObj)
         addedCount++
         console.log(`    ✅ 已添加`)
