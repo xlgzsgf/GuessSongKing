@@ -1,24 +1,24 @@
 {
-	"name": "guess-song-king",
-	"version": "1.0.0",
-	"description": "猜歌王游戏 - Vue版本",
-	"type": "module",
-	"scripts": {
-		"dev": "vite",
-		"build": "vite build",
-		"preview": "vite preview",
-		"manager": "node scripts/songManager.js",
-		"version": "node scripts/versionManager.js"
-	},
-	"dependencies": {
-		"fs-extra": "^11.3.2",
-		"vant": "^4.9.1",
-		"vue": "^3.4.21",
-		"vue-router": "^4.3.0"
-	},
-	"devDependencies": {
-		"@vitejs/plugin-vue": "^5.0.4",
-		"fluent-ffmpeg": "^2.1.2",
-		"vite": "^5.2.0"
-	}
+  "name": "guess-song-king",
+  "version": "1.1.0",
+  "description": "猜歌王游戏 - Vue版本",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "manager": "node scripts/songManager.js",
+    "version": "node scripts/versionManager.js"
+  },
+  "dependencies": {
+    "fs-extra": "^11.3.2",
+    "vant": "^4.9.1",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "fluent-ffmpeg": "^2.1.2",
+    "vite": "^5.2.0"
+  }
 }
