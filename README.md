@@ -1,13 +1,14 @@
+# 猜歌王
+
+![GuessSongKing](https://socialify.git.ci/xlgzsgf/GuessSongKing/image?language=1&owner=1&name=1&stargazers=1&theme=Light)
 
 <p align="center">
   <img src="./static/logo.png" alt="Logo" width="150">
 </p>
 
 <p align="center">
-  <img src="./static/title.png" alt="猜歌王" width="100">
+  <img src="./static/title.png" alt="猜歌王" width="150">
 </p>
-
-![GuessSongKing](https://socialify.git.ci/xlgzsgf/GuessSongKing/image?language=1&owner=1&name=1&stargazers=1&theme=Light)
 
 [![Build & Deploy](https://github.com/xlgzsgf/GuessSongKing/actions/workflows/main.yml/badge.svg)](https://github.com/xlgzsgf/GuessSongKing/actions/workflows/main.yml)
 
