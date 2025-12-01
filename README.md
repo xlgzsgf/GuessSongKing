@@ -16,11 +16,11 @@
 ![](https://img.shields.io/github/stars/xlgzsgf/GuessSongKing)
 
 
-一款基于Vue 3和Vant UI框架开发的猜歌游戏。
+一款基于Vue 3开发的音乐竞猜游戏，玩家可以通过聆听开头6秒歌曲片段来猜测歌名。游戏内置多个主题曲库，如薛之谦、陈奕迅、周杰伦等歌手专辑以及华语金曲合集。玩家可以选择不同曲库进行挑战，通过答对歌曲名称来测试自己的音乐知识水平。游戏支持断点续玩、成绩统计和历史记录追踪，让玩家可以随时暂停并在之后继续游戏，同时还能查看自己的当局和历史记录。
 
 ## 游戏预览
 
-<img src="./docs/images/screenshot.png" alt="游戏界面" width="70%">
+<img src="./docs/images/screenshot.png" alt="游戏界面" width="100%">
 
 ## 技术栈
 
@@ -59,18 +59,22 @@ pnpm preview
 
 ```
 ├── src/
+│   ├── assets/         # 静态资源
+│   ├── components/     # 组件
 │   ├── views/          # 页面组件
 │   │   ├── Home.vue    # 首页
 │   │   ├── LibrarySelect.vue    # 曲库选择页面
 │   │   └── GuessSong.vue # 猜歌页面
 │   ├── router/         # 路由配置
 │   ├── utils/          # 工具函数
+│   ├── store/          # 状态管理
 │   ├── App.vue         # 根组件
 │   └── main.js         # 入口文件
 ├── public/
 │   ├── Question/       # 题库音频文件
 │   └── effect/         # 音效
 ├── scripts/            # 管理工具脚本
+├── docs/               # 文档
 ├── vite.config.js      # Vite配置文件
 └── index.html          # HTML模板
 ```
