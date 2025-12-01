@@ -153,7 +153,7 @@
                         class="pause-btn view-score-btn"
                         round
                     >
-                        <span class="btn-icon icon-score"></span>
+                        <span class="btn-icon icon-score-white"></span>
                         查看成绩
                     </van-button>
                     <van-button
@@ -327,6 +327,7 @@ const timer = ref(null)
 const showScorePopup = ref(false)
 const showPausePopup = ref(false)
 const questionData = ref([]) // 改为数组存储所有歌曲
+const answeredSongs = ref(new Set()) // 存储已回答的歌曲ID
 const historyStats = ref(null)
 
 // 歌手相关状态
@@ -372,8 +373,19 @@ function loadRandomSong() {
         return
     }
 
+    // 过滤掉已经回答过的歌曲
+    const availableSongs = questionData.value.filter(song => 
+        !answeredSongs.value.has(song.songId)
+    )
+
+    // 如果所有歌曲都已经回答过，则清除已回答列表，重新开始
+    if (availableSongs.length === 0) {
+        answeredSongs.value.clear()
+        availableSongs.push(...questionData.value)
+    }
+
     // 随机选择一首歌
-    const song = getRandomSong(questionData.value)
+    const song = getRandomSong(availableSongs)
     if (!song) {
         showToast('没有可用的歌曲')
         return
@@ -431,6 +443,11 @@ function checkData() {
             message: '不对哦'
         })
         failNumber.value++
+    }
+
+    // 将歌曲添加到已回答列表（无论答对还是答错）
+    if (currentSongData.value && currentSongData.value.songId) {
+        answeredSongs.value.add(currentSongData.value.songId)
     }
 }
 
@@ -491,6 +508,7 @@ function saveGameState() {
         firstTrySuccess: firstTrySuccess.value,
         totalQuestions: totalQuestions.value,
         useTime: useTime.value,
+        answeredSongs: Array.from(answeredSongs.value), // 将Set转换为数组保存
         timestamp: Date.now()
     }
 
@@ -527,6 +545,11 @@ function restoreGameState() {
     firstTrySuccess.value = savedState.firstTrySuccess || 0
     totalQuestions.value = savedState.totalQuestions || 0
     useTime.value = savedState.useTime || 0
+    
+    // 恢复已回答的歌曲列表
+    if (savedState.answeredSongs) {
+        answeredSongs.value = new Set(savedState.answeredSongs)
+    }
 
     // 如果游戏正在进行，自动进入暂停状态
     if (gameStarted.value) {
@@ -694,6 +717,7 @@ function endGame() {
     songName.value = ''
     currentMusic.value = ''
     currentSong.value = ''
+    answeredSongs.value.clear()
 
     // 显示提示信息
     showToast({
@@ -1113,6 +1137,10 @@ onUnmounted(() => {
 
 .btn-icon.icon-score {
     background-image: url(/static/icon/Star.svg);
+}
+
+.btn-icon.icon-score-white {
+  background-image: url(/static/icon/Star.svg);
 }
 
 .pause-icon.icon-pause-large {
