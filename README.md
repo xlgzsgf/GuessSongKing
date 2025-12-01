@@ -57,6 +57,7 @@ pnpm preview
 ├── src/
 │   ├── views/          # 页面组件
 │   │   ├── Home.vue    # 首页
+│   │   ├── LibrarySelect.vue    # 曲库选择页面
 │   │   └── GuessSong.vue # 猜歌页面
 │   ├── router/         # 路由配置
 │   ├── utils/          # 工具函数
