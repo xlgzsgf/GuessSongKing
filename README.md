@@ -75,7 +75,7 @@ pnpm preview
 使用以下命令运行题库管理工具：
 
 ```bash
-npm run manager
+pnpm manager
 ```
 
 通过该工具可以：
