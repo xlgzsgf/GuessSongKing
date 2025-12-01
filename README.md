@@ -87,10 +87,10 @@ npm run manager
 
 详细使用说明请参考 [scripts/README.md](scripts/README.md)。
 
-## Star History
+## Star历史
 
 [![Star History Chart](https://api.star-history.com/svg?repos=xlgzsgf/GuessSongKing&type=date&legend=top-left)](https://www.star-history.com/#xlgzsgf/GuessSongKing&type=date&legend=top-left)
 
-## Contributor
+## 贡献者
 
-[![Star History Chart](https://contrib.rocks/image?repo=xlgzsgf/GuessSongKing)
+![Contributor](https://contrib.rocks/image?repo=xlgzsgf/GuessSongKing)
