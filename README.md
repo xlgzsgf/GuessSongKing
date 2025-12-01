@@ -2,15 +2,19 @@
 
 ![GuessSongKing](https://socialify.git.ci/xlgzsgf/GuessSongKing/image?language=1&owner=1&name=1&stargazers=1&theme=Light)
 
-<p align="center">
-  <img src="./static/logo.png" alt="Logo" width="150">
-</p>
+<div align="center" style="display: flex; justify-content: center; align-items: center; gap: 20px;">
+  <img src="./static/logo.png" alt="Logo" width="100">
+  <img src="./static/title.png" alt="猜歌王" width=150">
+</div>
 
-<p align="center">
-  <img src="./static/title.png" alt="猜歌王" width="150">
-</p>
+![](https://img.shields.io/badge/Chrome-4285F4?style=plastic&logo=GoogleChrome&logoColor=white)
+![](https://img.shields.io/github/license/xlgzsgf/GuessSongKing.svg?logo=github)
 
 [![Build & Deploy](https://github.com/xlgzsgf/GuessSongKing/actions/workflows/main.yml/badge.svg)](https://github.com/xlgzsgf/GuessSongKing/actions/workflows/main.yml)
+[![releases](https://img.shields.io/github/release/xlgzsgf/GuessSongKing)](https://github.com/xlgzsgf/GuessSongKing/releases)
+![](https://img.shields.io/github/issues/xlgzsgf/GuessSongKing?color=F48D73)
+![](https://img.shields.io/github/stars/xlgzsgf/GuessSongKing)
+
 
 一款基于Vue 3和Vant UI框架开发的猜歌游戏。
 
@@ -23,26 +27,28 @@
 
 ## 安装依赖
 
+本项目使用 pnpm 作为包管理器，请自行安装 pnpm。
+
 ```bash
-npm install
+pnpm install
 ```
 
 ## 开发
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 ## 构建
 
 ```bash
-npm run build
+pnpm build
 ```
 
 ## 预览
 
 ```bash
-npm run preview
+pnpm preview
 ```
 
 ## 项目结构
@@ -57,21 +63,12 @@ npm run preview
 │   ├── App.vue         # 根组件
 │   └── main.js         # 入口文件
 ├── public/
-│   ├── Question/       # 题目和音频文件
-│   └── static/         # 静态资源（音效、图标等）
+│   ├── Question/       # 题库音频文件
+│   └── effect/         # 音效
 ├── scripts/            # 管理工具脚本
 ├── vite.config.js      # Vite配置文件
 └── index.html          # HTML模板
 ```
-
-## 音效文件说明
-
-音效文件位于 `static/effect` 目录中：
-- correct-answer.mp3 - 回答正确音效
-- wrong-answer.mp3 - 回答错误音效
-- skip-question.mp3 - 跳过题目音效
-
-在构建过程中，这些音效文件会自动复制到构建输出目录中，确保在生产环境中可以正常使用。
 
 ## 题库管理
 
@@ -94,3 +91,6 @@ npm run manager
 
 [![Star History Chart](https://api.star-history.com/svg?repos=xlgzsgf/GuessSongKing&type=date&legend=top-left)](https://www.star-history.com/#xlgzsgf/GuessSongKing&type=date&legend=top-left)
 
+## Contributor
+
+[![Star History Chart](https://contrib.rocks/image?repo=xlgzsgf/GuessSongKing)
