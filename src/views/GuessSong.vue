@@ -481,9 +481,9 @@ function loadRandomSong() {
     }
 
     // 过滤掉已经回答过的歌曲
-    const availableSongs = questionData.value.filter(song =>
-        !answeredSongs.value.has(song.songId)
-    )
+    const availableSongs = questionData.value.filter(song => !answeredSongs.value.has(song.songId))
+
+  console.log(availableSongs.length)
 
     // 如果所有歌曲都已经回答过，则清除已回答列表，重新开始
     if (availableSongs.length === 0) {
@@ -549,6 +549,10 @@ function checkData() {
             firstTrySuccess.value++
         }
 
+        if (currentSongData.value && currentSongData.value.songId) {
+          answeredSongs.value.add(currentSongData.value.songId)
+        }
+
         nextSong()
     } else {
         playWrongEffect()
@@ -557,11 +561,6 @@ function checkData() {
             message: '不对哦'
         })
         failNumber.value++
-    }
-
-    // 将歌曲添加到已回答列表（无论答对还是答错）
-    if (currentSongData.value && currentSongData.value.songId) {
-        answeredSongs.value.add(currentSongData.value.songId)
     }
 }
 
@@ -909,6 +908,9 @@ function confirmSkip() {
     skippedArtistName.value = (currentSongData.value && currentSongData.value.artistName)
         || currentArtistName.value
         || '未知歌手'
+
+    // 跳过的歌曲不需要添加到已回答列表，因为用户可能还想再听一遍
+
     showSkipResultPopup.value = true
     playSkipEffect()
 }
@@ -1159,7 +1161,7 @@ onUnmounted(() => {
 }
 
 .avatar {
-    animation: rotator 6s cubic-bezier(0.4, 0.1, 0.6, 0.9) paused;
+    animation: rotator 6s cubic-bezier(0.4, 0, 0.6, 0.9) paused;
     animation-play-state: running;
 }
 
