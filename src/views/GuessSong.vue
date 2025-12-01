@@ -25,8 +25,8 @@
                         @error="handleImageError">
                 </div>
                 <div class="play-control" @click="togglePlay" v-if="gameStarted">
-                    <span class="play-icon" v-if="!isPlaying">▶</span>
-                    <span class="pause-icon" v-else>⏸</span>
+                    <span class="play-icon" v-if="!isPlaying"></span>
+                    <span class="pause-icon" v-else></span>
                 </div>
             </div>
             <p class="player-hint" v-if="!gameStarted">点击"开始"按钮开始游戏</p>
@@ -65,7 +65,7 @@
                         class="action-btn replay-btn"
                         round
                     >
-                        <span class="btn-icon">↻</span>
+                        <span class="btn-icon icon-replay"></span>
                         重播
                     </van-button>
 
@@ -77,7 +77,7 @@
                         class="action-btn pause-btn"
                         round
                     >
-                        <span class="btn-icon">⏸</span>
+                        <span class="btn-icon icon-pause"></span>
                         暂停
                     </van-button>
                 </div>
@@ -91,7 +91,7 @@
                         class="action-btn skip-btn"
                         round
                     >
-                        <span class="btn-icon">→</span>
+                        <span class="btn-icon icon-skip"></span>
                         跳过
                     </van-button>
 
@@ -103,7 +103,7 @@
                         class="action-btn score-btn"
                         round
                     >
-                        <span class="btn-icon">✦</span>
+                        <span class="btn-icon icon-score"></span>
                         成绩
                     </van-button>
                 </div>
@@ -119,7 +119,7 @@
             :close-on-click-overlay="false"
         >
             <div class="pause-content">
-                <div class="pause-icon">⏸</div>
+                <div class="pause-icon icon-pause-large"></div>
                 <h3 class="pause-title">游戏已暂停</h3>
                 <p class="pause-hint">恢复后将换一首新歌曲</p>
 
@@ -153,7 +153,7 @@
                         class="pause-btn view-score-btn"
                         round
                     >
-                        <span class="btn-icon">✦</span>
+                        <span class="btn-icon icon-score"></span>
                         查看成绩
                     </van-button>
                     <van-button
@@ -979,20 +979,25 @@ onUnmounted(() => {
 .play-icon,
 .pause-icon {
     color: #00f5ff;
-    font-size: 28px;
+    font-size: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
     filter: drop-shadow(0 0 10px rgba(0, 245, 255, 0.8));
-    width: 100%;
-    height: 100%;
+    width: 50%;
+    height: 50%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .play-icon {
+    background-image: url(/static/icon/Play.svg);
     margin-left: 3px;
 }
 
 .pause-icon {
+    background-image: url(/static/icon/Pause.svg);
     margin-left: 0;
 }
 
@@ -1005,7 +1010,7 @@ onUnmounted(() => {
 }
 
 .avatar {
-    animation: rotator 10s linear infinite;
+    animation: rotator 6s linear infinite;
     animation-play-state: running;
 }
 
@@ -1085,7 +1090,42 @@ onUnmounted(() => {
 
 .btn-icon {
     margin-right: 8px;
-    font-size: 20px;
+    font-size: 17px;
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-size: contain;
+    background-repeat: no-repeat;
+    vertical-align: middle;
+}
+
+.btn-icon.icon-replay {
+    background-image: url(/static/icon/Replay.svg)
+}
+
+.btn-icon.icon-pause {
+    background-image: url(/static/icon/Pause_White.svg);
+}
+
+.btn-icon.icon-skip {
+    background-image: url(/static/icon/Right_Arrow.svg);
+}
+
+.btn-icon.icon-score {
+    background-image: url(/static/icon/Star.svg);
+}
+
+.pause-icon.icon-pause-large {
+    font-size: 64px;
+    color: #00f5ff;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 20px rgba(0, 245, 255, 0.5));
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-image: url(/static/icon/Pause.svg);
 }
 
 .action-buttons {
@@ -1138,12 +1178,6 @@ onUnmounted(() => {
     text-align: center;
 }
 
-.pause-icon {
-    font-size: 64px;
-    color: #00f5ff;
-    margin-bottom: 20px;
-    filter: drop-shadow(0 0 20px rgba(0, 245, 255, 0.5));
-}
 
 .pause-title {
     font-size: 26px;

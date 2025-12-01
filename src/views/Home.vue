@@ -14,15 +14,15 @@
 
             <div class="features">
                 <div class="feature-item">
-                    <span class="feature-icon">🎵</span>
+                    <span class="feature-icon icon-music"></span>
                     <span class="feature-text">海量曲库</span>
                 </div>
                 <div class="feature-item">
-                    <span class="feature-icon">⚡</span>
+                    <span class="feature-icon icon-bolt"></span>
                     <span class="feature-text">即时挑战</span>
                 </div>
                 <div class="feature-item">
-                    <span class="feature-icon">🏆</span>
+                    <span class="feature-icon icon-trophy"></span>
                     <span class="feature-text">排行榜</span>
                 </div>
             </div>
@@ -157,6 +157,23 @@ function startGame() {
 .feature-icon {
     font-size: 32px;
     filter: drop-shadow(0 0 12px rgba(0, 245, 255, 0.4));
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.feature-icon.icon-music {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgb(255, 255, 255)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18V5l12-2v13'%3E%3C/path%3E%3Ccircle cx='6' cy='18' r='3'%3E%3C/circle%3E%3Ccircle cx='18' cy='16' r='3'%3E%3C/circle%3E%3C/svg%3E");
+}
+
+.feature-icon.icon-bolt {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgb(255, 255, 255)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2'%3E%3C/polygon%3E%3C/svg%3E");
+}
+
+.feature-icon.icon-trophy {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgb(255, 255, 255)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9H4.5a2.5 2.5 0 0 1 0-5H6'%3E%3C/path%3E%3Cpath d='M18 9h1.5a2.5 2.5 0 0 0 0-5H18'%3E%3C/path%3E%3Cpath d='M4 22h16'%3E%3C/path%3E%3Cpath d='M10 14.66V17c0 .55.47.98.97 1.21C12.04 18.75 12 19.5 12 20v1'%3E%3C/path%3E%3Cpath d='M14 14.66V17c0 .55-.47.98-.97 1.21C11.96 18.75 12 19.5 12 20v1'%3E%3C/path%3E%3Cpath d='M18 2H6v7a6 6 0 0 0 12 0V2Z'%3E%3C/path%3E%3C/svg%3E");
 }
 
 .feature-text {
