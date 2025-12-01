@@ -1,22 +1,131 @@
-name: Deploy to OSS
+name: 构建&分发
+
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.OSS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
-        aws-region: ${{ secrets.OSS_REGION }}
-    
-    - name: Upload to OSS
-      run: |
-        # 使用 --update 参数，只上传更新或新增的文件
-        ossutil cp -r ./dist/ oss://qiancheng-guess-song/ --update
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-package
+          path: dist
+          if-no-files-found: error
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-package
+          path: dist
+
+      - name: Configure OSS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.OSS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
+          aws-region: ${{ secrets.OSS_REGION }}
+
+      - name: Upload to OSS
+        run: |
+          # 使用 --update 参数，只上传更新或新增的文件
+          ossutil cp -r ./dist/ oss://qiancheng-guess-song/ --update
+
+  purge-edgeone:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install EdgeOne SDK dependency
+        run: npm install tencentcloud-sdk-nodejs
+
+      - name: Purge EdgeOne CDN cache
+        environment: production
+        env:
+          TENCENT_CLOUD_SECRET_ID: ${{ secrets.TENCENT_CLOUD_SECRET_ID }}
+          TENCENT_CLOUD_SECRET_KEY: ${{ secrets.TENCENT_CLOUD_SECRET_KEY }}
+          EDGEONE_ZONE_ID: ${{ secrets.EDGEONE_ZONE_ID }}
+          EDGEONE_TARGETS: ${{ secrets.EDGEONE_TARGETS }}
+          EDGEONE_PURGE_TYPE: ${{ secrets.EDGEONE_PURGE_TYPE }}
+          EDGEONE_REGION: ${{ secrets.EDGEONE_REGION }}
+        run: |
+          cat <<'EOF' > clearCache.js
+          const tencentcloud = require('tencentcloud-sdk-nodejs');
+          const TeoClient = tencentcloud.teo.v20220901.Client;
+
+          const zoneId = process.env.EDGEONE_ZONE_ID;
+          const region = process.env.EDGEONE_REGION || 'ap-chengdu';
+          const targets = (process.env.EDGEONE_TARGETS || '')
+            .split(/[\n,]/)
+            .map(item => item.trim())
+            .filter(Boolean);
+          const type = process.env.EDGEONE_PURGE_TYPE || 'purge_host';
+
+          if (!zoneId) {
+            throw new Error('EDGEONE_ZONE_ID is required.');
+          }
+
+          if (!targets.length) {
+            throw new Error('EDGEONE_TARGETS must contain at least one entry.');
+          }
+
+          const client = new TeoClient({
+            credential: {
+              secretId: process.env.TENCENT_CLOUD_SECRET_ID,
+              secretKey: process.env.TENCENT_CLOUD_SECRET_KEY,
+            },
+            region,
+            profile: {
+              httpProfile: {
+                endpoint: 'teo.tencentcloudapi.com',
+              },
+            },
+          });
+
+          client.CreatePurgeTask({
+            ZoneId: zoneId,
+            Type: type,
+            Targets: targets,
+          }).then(
+            data => {
+              console.log('Purge task submitted:', data);
+            },
+            err => {
+              console.error('EdgeOne purge failed:', err);
+              process.exit(1);
+            }
+          );
+          EOF
+
+          node clearCache.js
