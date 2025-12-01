@@ -1,14 +1,16 @@
 # 猜歌王 - 千诚
 
 <p align="center">
-  <img src="./static/logo.png" alt="Logo" width="200">
+  <img src="./static/logo.png" alt="Logo" width="100">
 </p>
 
 <p align="center">
-  <img src="./static/title.png" alt="猜歌王" width="300">
+  <img src="./static/title.png" alt="猜歌王" width="200">
 </p>
 
-https://socialify.git.ci/xlgzsgf/GuessSongKing/image?
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=xlgzsgf/GuessSongKing&type=date&legend=top-left)](https://www.star-history.com/#xlgzsgf/GuessSongKing&type=date&legend=top-left)
 
 [![Build & Deploy](https://github.com/xlgzsgf/GuessSongKing/actions/workflows/main.yml/badge.svg)](https://github.com/xlgzsgf/GuessSongKing/actions/workflows/main.yml)
 
