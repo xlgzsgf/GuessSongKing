@@ -18,6 +18,10 @@
 
 一款基于Vue 3和Vant UI框架开发的猜歌游戏。
 
+## 游戏预览
+
+<img src="./docs/images/screenshot.png" alt="游戏界面" width="70%">
+
 ## 技术栈
 
 - Vue 3
