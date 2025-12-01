@@ -32,7 +32,7 @@
           <div class="artist-details">
             <div class="artist-name-row">
               <h2 class="artist-name">{{ artist.name }}</h2>
-              <span class="playing-badge" v-if="getArtistStats(artist.id)?.isPlaying">游戏中</span>
+              <span class="playing-badge" v-if="hasActiveGame(artist.id)">游戏中</span>
             </div>
             <p class="song-count">{{ artist.songCount }} 首歌曲</p>
 
@@ -75,7 +75,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { getGameRecords, getCurrentGame } from '../utils/gameStorage'
@@ -118,8 +118,7 @@ const loadArtistStats = () => {
         totalGames: 0,
         totalCorrect: 0,
         totalQuestions: 0,
-        bestAccuracy: 0,
-        isPlaying: false
+        bestAccuracy: 0
       }
     }
 
@@ -134,24 +133,13 @@ const loadArtistStats = () => {
     }
   })
 
-  // 检查每个歌手是否有进行中的游戏
-  artists.value.forEach(artist => {
-    const savedGame = getCurrentGame(artist.id)
-    if (savedGame && savedGame.gameStarted) {
-      if (!stats[artist.id]) {
-        stats[artist.id] = {
-          totalGames: 0,
-          totalCorrect: 0,
-          totalQuestions: 0,
-          bestAccuracy: 0,
-          isPlaying: false
-        }
-      }
-      stats[artist.id].isPlaying = true
-    }
-  })
-
   artistStats.value = stats
+}
+
+// 检查歌手是否有活跃的游戏
+const hasActiveGame = (artistId) => {
+  const savedGame = getCurrentGame(artistId)
+  return savedGame && savedGame.gameStarted
 }
 
 // 获取歌手统计信息
@@ -197,6 +185,11 @@ const goBack = () => {
 onMounted(() => {
   loadQuestionIndex()
   loadArtistStats()
+})
+
+// 监听艺术家列表变化，当艺术家数据加载完成后检查游戏状态
+watch(artists, () => {
+  // 不需要额外的操作，因为 hasActiveGame 函数会在渲染时调用
 })
 </script>
 
