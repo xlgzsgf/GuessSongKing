@@ -47,17 +47,16 @@ jobs:
           name: dist-package
           path: dist
 
-      - name: Configure OSS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Deploy to OSS
+        uses: fangbinwei/aliyun-oss-website-action@v1
         with:
-          aws-access-key-id: ${{ secrets.OSS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
-          aws-region: ${{ secrets.OSS_REGION }}
-
-      - name: Upload to OSS
-        run: |
-          # 使用 --update 参数，只上传更新或新增的文件
-          ossutil cp -r ./dist/ oss://qiancheng-guess-song/ --update
+          accessKeyId: ${{ secrets.OSS_ACCESS_KEY_ID }}
+          accessKeySecret: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
+          bucket: ${{ secrets.OSS_BUCKET }}
+          endpoint: ${{ secrets.OSS_REGION }}
+          folder: dist
+          incremental: true
+          skipSetting: true
 
   purge-edgeone:
     needs: deploy
