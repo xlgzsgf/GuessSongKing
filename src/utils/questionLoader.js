@@ -87,9 +87,12 @@ export async function loadAllSongs() {
 
                 // 将歌曲信息转换为游戏需要的格式
                 artistInfo.songs.forEach(song => {
+                    // 使用歌曲中定义的歌手信息，如果没有则使用默认歌手
+                    const songArtists = song.artists || [artistInfo.defaultArtist || artist.name]
+                    
                     allSongs.push({
                         artistId: artist.id,
-                        artistName: artist.name,
+                        artistName: songArtists.join('、'),
                         songId: song.id,
                         songName: song.name,
                         url: getSongUrl(artist.id, song.id)
@@ -117,8 +120,11 @@ export async function loadArtistSongs(artistId) {
         const artistInfo = await loadArtistInfo(artistId)
 
         return artistInfo.songs.map(song => ({
+            // 使用歌曲中定义的歌手信息，如果没有则使用默认歌手
+            const songArtists = song.artists || [artistInfo.defaultArtist || artistInfo.artistName]
+            
             artistId: artistInfo.artistId,
-            artistName: artistInfo.artistName,
+            artistName: songArtists.join('、'),
             songId: song.id,
             songName: song.name,
             url: getSongUrl(artistInfo.artistId, song.id)

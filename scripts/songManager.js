@@ -35,6 +35,68 @@ function trimAudio(inputPath, outputPath, duration = AUDIO_DURATION) {
     })
 }
 
+// 从文件名中提取歌手信息
+function extractArtistsFromFile(filename) {
+    // 匹配格式如 "薛之谦 - 演员" 或 "薛之谦、韩红 - 小尖尖"
+    const match = filename.match(/^([^-]+)\s*-/) 
+    if (match) {
+        // 提取歌手部分并去除多余空格
+        const artistsStr = match[1].trim()
+        // 如果包含顿号或者中文逗号，分割成多个歌手
+        if (artistsStr.includes('、') || artistsStr.includes('，') || artistsStr.includes(',')) {
+            return artistsStr.split(/[、，,]/).map(artist => artist.trim())
+        }
+        // 单一歌手
+        return [artistsStr]
+    }
+    // 无法提取歌手信息
+    return null
+}
+
+// 从文件名中提取歌曲名（删除括号及其内容）
+function extractSongName(filename) {
+    // 删除括号及其内容，支持各种括号类型: (), [], {}, （）, 【】
+    // 同时处理中英文空格
+    let cleanName = filename.replace(/[\(\[\{\（\【][^\)\]\}\）\】]*[\)\]\}\）\】]/g, '');
+    // 删除可能残留的空格
+    cleanName = cleanName.replace(/\s+/g, ' ').trim();
+    return cleanName;
+}
+
+// 从文件名中提取纯净的歌曲名（去除歌手部分）
+function extractPureSongName(filename) {
+    // 先删除括号内容
+    const cleanFilename = extractSongName(filename);
+    // 匹配格式如 "薛之谦 - 演员" 或 "薛之谦、韩红 - 小尖尖"
+    const match = cleanFilename.match(/^[^-]+\s*-\s*(.+)$/) 
+    if (match) {
+        // 提取歌曲名部分并去除多余空格
+        return match[1].trim();
+    }
+    // 如果没有匹配到格式，则返回原文件名
+    return cleanFilename;
+}
+
+// 从文件名中提取歌手信息
+function extractArtistsFromFile(filename) {
+    // 先删除括号内容
+    const cleanFilename = extractSongName(filename)
+    // 匹配格式如 "薛之谦 - 演员" 或 "薛之谦、韩红 - 小尖尖"
+    const match = cleanFilename.match(/^([^-]+)\s*-/) 
+    if (match) {
+        // 提取歌手部分并去除多余空格
+        const artistsStr = match[1].trim()
+        // 如果包含顿号或者中文逗号，分割成多个歌手
+        if (artistsStr.includes('、') || artistsStr.includes('，') || artistsStr.includes(',')) {
+            return artistsStr.split(/[、，,]/).map(artist => artist.trim())
+        }
+        // 单一歌手
+        return [artistsStr]
+    }
+    // 无法提取歌手信息
+    return null
+}
+
 // 封装 question 为 Promise
 function question(query) {
     return new Promise(resolve => rl.question(query, resolve))
@@ -126,7 +188,9 @@ async function addNewArtist(index) {
         artistId: newId,
         artistName: artistName.trim(),
         songCount: 0,
-        songs: []
+        songs: [],
+        // 添加默认歌手字段，表示该歌手的所有歌曲
+        defaultArtist: artistName.trim()
     }
 
     // 保存歌手信息
@@ -179,31 +243,59 @@ async function batchImportSongs(index, artistId) {
     }
 
     // 去重检查
-    const existingSongNames = new Set(artistInfo.songs.map(s => s.name.toLowerCase().trim()))
-    const newSongNames = new Set()
+    const existingSongMap = new Map(artistInfo.songs.map(s => [s.name.toLowerCase().trim(), s]))
+    const newSongMap = new Map() // 存储清理后的歌曲名到原始文件的映射
     const validFiles = []
     const duplicateFiles = []
 
     console.log(`\n🔍 检查重复歌曲...`)
 
     for (const file of namedFiles) {
-        const songName = file.replace('.mp3', '').trim()
-        const songNameLower = songName.toLowerCase()
+        // 清理文件名（删除括号内容）
+        const cleanSongName = extractSongName(file.replace('.mp3', '').trim())
+        const cleanSongNameLower = cleanSongName.toLowerCase()
 
         // 检查是否与已有歌曲重复
-        if (existingSongNames.has(songNameLower)) {
-            duplicateFiles.push({ file, songName, reason: '已存在于数据库' })
+        if (existingSongMap.has(cleanSongNameLower)) {
+            duplicateFiles.push({ file, songName: cleanSongName, reason: '已存在于数据库' })
             continue
         }
 
         // 检查是否与本次导入的其他歌曲重复
-        if (newSongNames.has(songNameLower)) {
-            duplicateFiles.push({ file, songName, reason: '与本次导入的其他歌曲重复' })
-            continue
+        if (newSongMap.has(cleanSongNameLower)) {
+            const existingFile = newSongMap.get(cleanSongNameLower)
+            
+            // 优先选择无括号的版本
+            const hasBrackets = (file.includes('(') || file.includes('[') || file.includes('{') || 
+                               file.includes('（') || file.includes('【'))
+            const existingHasBrackets = (existingFile.file.includes('(') || existingFile.file.includes('[') || 
+                                        existingFile.file.includes('{') || existingFile.file.includes('（') || 
+                                        existingFile.file.includes('【'))
+            
+            if (hasBrackets && !existingHasBrackets) {
+                // 新文件有括号，已有文件无括号，保留已有文件，标记新文件为重复
+                duplicateFiles.push({ file, songName: cleanSongName, reason: '与本次导入的其他歌曲重复' })
+                continue
+            } else if (!hasBrackets && existingHasBrackets) {
+                // 新文件无括号，已有文件有括号，替换已有文件
+                const index = validFiles.findIndex(f => f.file === existingFile.file)
+                if (index !== -1) {
+                    validFiles.splice(index, 1)
+                }
+                duplicateFiles.push({ file: existingFile.file, songName: cleanSongName, reason: '与本次导入的其他歌曲重复' })
+                // 更新映射
+                newSongMap.set(cleanSongNameLower, { file, songName: cleanSongName })
+                validFiles.push({ file, songName: cleanSongName })
+                continue
+            } else {
+                // 两者都有或都无括号，保留第一个
+                duplicateFiles.push({ file, songName: cleanSongName, reason: '与本次导入的其他歌曲重复' })
+                continue
+            }
         }
 
-        newSongNames.add(songNameLower)
-        validFiles.push({ file, songName })
+        newSongMap.set(cleanSongNameLower, { file, songName: cleanSongName })
+        validFiles.push({ file, songName: cleanSongName })
     }
 
     // 显示去重结果
@@ -269,11 +361,25 @@ async function batchImportSongs(index, artistId) {
             // 重命名临时文件为最终文件名
             fs.renameSync(tempPath, newPath)
 
+            // 从文件名中提取歌手信息
+            const artistFromFilename = extractArtistsFromFile(songName)
+            
+            // 清理歌曲名（删除括号内容并提取纯净歌曲名）
+            const cleanSongName = extractSongName(songName)
+            const pureSongName = extractPureSongName(songName)
+            
             // 添加到歌曲列表
-            artistInfo.songs.push({
+            const songObj = {
                 id: newId,
-                name: songName
-            })
+                name: pureSongName
+            }
+            
+            // 如果能从文件名提取到歌手信息，则添加歌手字段
+            if (artistFromFilename) {
+                songObj.artists = artistFromFilename
+            }
+            
+            artistInfo.songs.push(songObj)
 
             console.log(`  ✅ ${file} → ${newFileName} (${songName})`)
             successCount++
@@ -397,11 +503,25 @@ async function addSongsToArtist(index, artistId) {
             continue
         }
 
+        // 清理歌曲名（删除括号内容并提取纯净歌曲名）
+        const cleanSongName = extractSongName(songName.trim())
+        const pureSongName = extractPureSongName(songName.trim())
+        
+        // 从文件名中提取歌手信息
+        const artistFromFilename = extractArtistsFromFile(songName.trim())
+        
         // 添加歌曲
-        artistInfo.songs.push({
+        const songObj = {
             id: fileId,
-            name: songName.trim()
-        })
+            name: pureSongName
+        }
+        
+        // 如果能从文件名提取到歌手信息，则添加歌手字段
+        if (artistFromFilename) {
+            songObj.artists = artistFromFilename
+        }
+        
+        artistInfo.songs.push(songObj)
         addedCount++
         console.log(`    ✅ 已添加`)
     }
