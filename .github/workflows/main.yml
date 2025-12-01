@@ -4,20 +4,6 @@ on:
   push:
     branches:
       - master
-  workflow_dispatch:
-    inputs:
-      edgeone_targets:
-        description: "Override CDN targets (comma/newline separated)"
-        required: false
-        default: ""
-      edgeone_purge_type:
-        description: "Override purge type (purge_host, purge_url, etc.)"
-        required: false
-        default: ""
-      skip_purge:
-        description: "Set true to skip EdgeOne purge"
-        required: false
-        default: "false"
 
 jobs:
   build:
