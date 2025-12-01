@@ -1,3 +1,5 @@
+import logo from '/static/logo.png'
+
 /**
  * 题库加载工具模块
  * 负责加载和管理新的题库结构
@@ -55,7 +57,7 @@ export function getSongUrl(artistId, songId) {
  */
 export function getArtistAvatarUrl(avatarUrl) {
     if (!avatarUrl) {
-        return '/static/logo.png'
+        return logo
     }
     // 如果是完整的URL（http/https开头），直接返回
     if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
@@ -89,7 +91,7 @@ export async function loadAllSongs() {
                 artistInfo.songs.forEach(song => {
                     // 使用歌曲中定义的歌手信息，如果没有则使用默认歌手
                     const songArtists = song.artists || [artistInfo.defaultArtist || artist.name]
-                    
+
                     allSongs.push({
                         artistId: artist.id,
                         artistName: songArtists.join('、'),
@@ -122,7 +124,7 @@ export async function loadArtistSongs(artistId) {
         return artistInfo.songs.map(song => {
             // 使用歌曲中定义的歌手信息，如果没有则使用默认歌手
             const songArtists = song.artists || [artistInfo.defaultArtist || artistInfo.artistName]
-            
+
             return {
                 artistId: artistInfo.artistId,
                 artistName: songArtists.join('、'),

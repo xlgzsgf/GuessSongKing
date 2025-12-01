@@ -79,6 +79,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { getGameRecords, getCurrentGame } from '../utils/gameStorage'
+import logo from '/static/logo.png'
 
 const router = useRouter()
 const libraries = ref([])
@@ -158,12 +159,12 @@ const getLibraryAvatar = (library) => {
     return library.avatar
   }
   // 默认头像
-  return '/static/logo.png'
+  return logo
 }
 
 // 图片加载失败处理
 const handleImageError = (e) => {
-  e.target.src = '/static/logo.png'
+  e.target.src = logo
 }
 
 // 选择曲库
