@@ -1,16 +1,13 @@
-# 猜歌王 - 千诚
 
 <p align="center">
-  <img src="./static/logo.png" alt="Logo" width="100">
+  <img src="./static/logo.png" alt="Logo" width="150">
 </p>
 
 <p align="center">
-  <img src="./static/title.png" alt="猜歌王" width="200">
+  <img src="./static/title.png" alt="猜歌王" width="100">
 </p>
 
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=xlgzsgf/GuessSongKing&type=date&legend=top-left)](https://www.star-history.com/#xlgzsgf/GuessSongKing&type=date&legend=top-left)
+![GuessSongKing](https://socialify.git.ci/xlgzsgf/GuessSongKing/image?language=1&owner=1&name=1&stargazers=1&theme=Light)
 
 [![Build & Deploy](https://github.com/xlgzsgf/GuessSongKing/actions/workflows/main.yml/badge.svg)](https://github.com/xlgzsgf/GuessSongKing/actions/workflows/main.yml)
 
@@ -92,4 +89,7 @@ npm run manager
 
 详细使用说明请参考 [scripts/README.md](scripts/README.md)。
 
-![](https://starchart.cc/xlgzsgf/GuessSongKing.svg)
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=xlgzsgf/GuessSongKing&type=date&legend=top-left)](https://www.star-history.com/#xlgzsgf/GuessSongKing&type=date&legend=top-left)
+
