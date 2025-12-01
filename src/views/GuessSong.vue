@@ -344,17 +344,17 @@ function initEffectAudios() {
         return
     }
 
-    correctEffectAudio = new Audio('/static/effect/correct-answer.mp3')
+    correctEffectAudio = new Audio('/effect/correct-answer.mp3')
     correctEffectAudio.preload = 'auto'
     correctEffectEndedHandler = () => {
         isCorrectEffectPlaying.value = false
     }
     correctEffectAudio.addEventListener('ended', correctEffectEndedHandler)
 
-    wrongEffectAudio = new Audio('/static/effect/wrong-answer.mp3')
+    wrongEffectAudio = new Audio('/effect/wrong-answer.mp3')
     wrongEffectAudio.preload = 'auto'
 
-    skipEffectAudio = new Audio('/static/effect/skip-question.mp3')
+    skipEffectAudio = new Audio('/effect/skip-question.mp3')
     skipEffectAudio.preload = 'auto'
 }
 
