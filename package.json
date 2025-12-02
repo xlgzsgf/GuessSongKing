@@ -7,8 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "manager": "node scripts/songManager.js",
-    "version": "node scripts/versionManager.js"
+    "manager": "node scripts/songManager.js"
   },
   "dependencies": {
     "fs-extra": "^11.3.2",
