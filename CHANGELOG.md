@@ -1,3 +1,11 @@
+## [1.2.1](https://github.com/xlgzsgf/GuessSongKing/compare/v1.2.0...v1.2.1) (2025-12-02)
+
+
+### Bug Fixes
+
+* :bug: fix .releaserc.yml ([c9b4a0d](https://github.com/xlgzsgf/GuessSongKing/commit/c9b4a0d0323a0587f140c2913490103a5ee22043))
+* :bug: fix release file ([74d77c5](https://github.com/xlgzsgf/GuessSongKing/commit/74d77c5286aeaa0feeeec44106638849f2d8162b))
+
 # [1.2.0](https://github.com/xlgzsgf/GuessSongKing/compare/v1.1.0...v1.2.0) (2025-12-02)
 
 
