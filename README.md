@@ -2,10 +2,12 @@
 
 ![GuessSongKing](https://socialify.git.ci/xlgzsgf/GuessSongKing/image?language=1&owner=1&name=1&stargazers=1&theme=Light)
 
-<div align="center" style="display: flex; justify-content: center; align-items: center; gap: 20px;">
-  <img src="./static/logo.png" alt="Logo" width="100">
+<div style="display: flex; flex-direction:row; justify-content: center; align-items: center; gap: 20px;">
+  <img src="./static/logo.png" alt="Logo" width="100"  style="margin-right: 5px;">
   <img src="./static/title.png" alt="猜歌王" width=150">
 </div>
+
+---
 
 ![](https://img.shields.io/badge/Chrome-4285F4?style=plastic&logo=GoogleChrome&logoColor=white)
 ![](https://img.shields.io/github/license/xlgzsgf/GuessSongKing.svg?logo=github)

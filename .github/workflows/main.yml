@@ -101,7 +101,7 @@ jobs:
 
   deploy:
     needs: [release, build]
-    if: needs.release.outputs.new_release == 'true'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     environment: oss-deploy
     steps:
@@ -127,7 +127,7 @@ jobs:
 
   purge-edgeone:
     needs: [release, deploy]
-    if: needs.release.outputs.new_release == 'true'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     environment: edgeone
     steps:
