@@ -9,6 +9,7 @@
 
 ![](https://img.shields.io/badge/Chrome-4285F4?style=plastic&logo=GoogleChrome&logoColor=white)
 ![](https://img.shields.io/github/license/xlgzsgf/GuessSongKing.svg?logo=github)
+[![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 
 [![Build & Deploy](https://github.com/xlgzsgf/GuessSongKing/actions/workflows/main.yml/badge.svg)](https://github.com/xlgzsgf/GuessSongKing/actions/workflows/main.yml)
 [![releases](https://img.shields.io/github/release/xlgzsgf/GuessSongKing)](https://github.com/xlgzsgf/GuessSongKing/releases)

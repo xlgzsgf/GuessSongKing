@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "fs-extra": "^11.3.2",
+    "semantic-release": "^25.0.2",
     "vant": "^4.9.1",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"

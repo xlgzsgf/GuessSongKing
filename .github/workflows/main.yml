@@ -2,14 +2,14 @@ name: Build & Deploy
 
 on:
   push:
-    branches:
-      - master
-  release:
-    types: [published]
+    branches: [ master ]
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
+    outputs:
+      build_success: ${{ steps.build.outputs.success }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,44 +29,80 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm run build
+        id: build
+        run: |
+          pnpm run build
+          echo "Build completed successfully"
+          echo "success=true" >> $GITHUB_OUTPUT
 
-      - name: Upload artifact
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: dist-package
           path: dist
           if-no-files-found: error
-      
-      # 打包构建产物用于 Release
-      - name: Package dist for release
-        if: github.event_name == 'release'
+          retention-days: 1
+
+  release:
+    name: Semantic Release
+    needs: build
+    if: needs.build.outputs.build_success == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    outputs:
+      new_release: ${{ steps.semantic.outputs.new_release }}
+      new_release_version: ${{ steps.semantic.outputs.new_release_version }}
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-package
+          path: dist
+
+      - name: Verify build files
         run: |
-          cd dist
-          zip -r ../dist.zip .
-      
-      # 上传构建产物到 Release
-      - name: Upload to Release
-        if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+          echo "Build files:"
+          ls -la dist/ || echo "No dist directory"
+
+      - name: Run semantic-release
+        id: semantic
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./dist.zip
-          asset_name: guess-song-king-${{ github.event.release.tag_name }}.zip
-          asset_content_type: application/zip
+        run: npx semantic-release@23
 
   deploy:
-    needs: build
+    needs: [release, build]
+    if: needs.release.outputs.new_release == 'true'
     runs-on: ubuntu-latest
     environment: oss-deploy
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: dist-package
-          path: dist
+          name: dist-package-${{ needs.build.outputs.new_release_version }}
 
       - name: Deploy to OSS
         uses: fangbinwei/aliyun-oss-website-action@v1
@@ -80,7 +116,8 @@ jobs:
           skipSetting: true
 
   purge-edgeone:
-    needs: deploy
+    needs: [release, deploy]
+    if: needs.release.outputs.new_release == 'true'
     runs-on: ubuntu-latest
     environment: edgeone
     steps:

@@ -1,0 +1,23 @@
+# 指定分支，只有合并到这些分支的代码才会触发发布
+branches:
+  - main
+  - name: 'beta' # 为预发布版本配置一个分支，会自动发布如 2.0.0-beta.1 的版本
+    prerelease: true
+
+# 定义发布步骤的插件
+plugins:
+  # 分析提交信息，计算版本号
+  - '@semantic-release/commit-analyzer'
+  # 生成变更日志和发布说明
+  - '@semantic-release/release-notes-generator'
+  # 生成或更新 CHANGELOG.md 文件
+  - '@semantic-release/changelog'
+  # 更新 package.json 中的版本号
+  - '@semantic-release/npm'
+  # 创建 Git tag 和 GitHub Release
+  - '@semantic-release/github'
+  # 将版本号变更和 CHANGELOG.md 的修改提交到仓库
+  - - '@semantic-release/git'
+    - assets: # 指定要提交的文件
+        - 'CHANGELOG.md'
+        - 'package.json'
