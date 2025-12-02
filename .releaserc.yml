@@ -1,6 +1,6 @@
 # 指定分支，只有合并到这些分支的代码才会触发发布
 branches:
-  - main
+  - master
   - name: 'beta' # 为预发布版本配置一个分支，会自动发布如 2.0.0-beta.1 的版本
     prerelease: true
 
