@@ -13,7 +13,8 @@ plugins:
   # 生成或更新 CHANGELOG.md 文件
   - '@semantic-release/changelog'
   # 更新 package.json 中的版本号
-  - '@semantic-release/npm'
+  - - '@semantic-release/npm'
+    - npmPublish: false
   # 创建 Git tag 和 GitHub Release
   - '@semantic-release/github'
   # 将版本号变更和 CHANGELOG.md 的修改提交到仓库
