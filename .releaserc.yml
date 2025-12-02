@@ -16,9 +16,11 @@ plugins:
   - - '@semantic-release/npm'
     - npmPublish: false
   # 创建 Git tag 和 GitHub Release
-  - '@semantic-release/github'
+  - - '@semantic-release/github'
+    - assets:
+        - 'guess-song-king-*.zip'
   # 将版本号变更和 CHANGELOG.md 的修改提交到仓库
   - - '@semantic-release/git'
     - assets: # 指定要提交的文件
-        - 'CHANGELOG.md'
+        - 'CHANGELOG.md'fix build dependence
         - 'package.json'

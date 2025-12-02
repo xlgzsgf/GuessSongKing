@@ -35,11 +35,17 @@ jobs:
           echo "Build completed successfully"
           echo "success=true" >> $GITHUB_OUTPUT
 
+      - name: Create zip archive of build files with versioned name
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          cd dist
+          zip -r ../guess-song-king-$VERSION.zip .
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: dist-package
-          path: dist
+          path: guess-song-king-*.zip
           if-no-files-found: error
           retention-days: 1
 
@@ -80,12 +86,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: dist-package
-          path: dist
+          path: .
 
       - name: Verify build files
         run: |
           echo "Build files:"
-          ls -la dist/ || echo "No dist directory"
+          ls -la guess-song-king-*.zip || echo "No versioned zip file found"
 
       - name: Run semantic-release
         id: semantic
@@ -102,7 +108,11 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: dist-package-${{ needs.build.outputs.new_release_version }}
+          name: dist-package
+
+      - name: Extract files
+        run: |
+          unzip guess-song-king-*.zip -d dist
 
       - name: Deploy to OSS
         uses: fangbinwei/aliyun-oss-website-action@v1
