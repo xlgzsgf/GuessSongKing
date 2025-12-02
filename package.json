@@ -1,6 +1,6 @@
 {
   "name": "guess-song-king",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "猜歌王游戏 - Vue版本",
   "type": "module",
   "scripts": {
