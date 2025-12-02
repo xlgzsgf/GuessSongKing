@@ -52,7 +52,7 @@ jobs:
   release:
     name: Semantic Release
     needs: build
-    if: needs.build.outputs.build_success == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: needs.build.outputs.build_success == 'true' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta')
     runs-on: ubuntu-latest
     outputs:
       new_release: ${{ steps.semantic.outputs.new_release }}
@@ -101,7 +101,7 @@ jobs:
 
   deploy:
     needs: [release, build]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta')
     runs-on: ubuntu-latest
     environment: oss-deploy
     steps:
