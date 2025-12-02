@@ -22,5 +22,5 @@ plugins:
   # 将版本号变更和 CHANGELOG.md 的修改提交到仓库
   - - '@semantic-release/git'
     - assets: # 指定要提交的文件
-        - 'CHANGELOG.md'fix build dependence
+        - 'CHANGELOG.md'
         - 'package.json'
